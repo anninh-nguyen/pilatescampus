@@ -24,6 +24,7 @@ import Notifications from "./pages/shared/Notifications";
 const queryClient = new QueryClient();
 
 const App = () => (
+  <ThemeProvider>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
