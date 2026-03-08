@@ -26,6 +26,7 @@ import TrainerProfile from "./pages/trainer/TrainerProfile";
 import TraineePackage from "./pages/trainee/TraineePackage";
 import TraineeBooking from "./pages/trainee/TraineeBooking";
 import TraineeBookings from "./pages/trainee/TraineeBookings";
+import TraineeProfile from "./pages/trainee/TraineeProfile";
 import Notifications from "./pages/shared/Notifications";
 import BookOnBehalf from "./pages/shared/BookOnBehalf";
 import ManageBookings from "./pages/shared/ManageBookings";
