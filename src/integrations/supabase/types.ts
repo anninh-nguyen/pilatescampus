@@ -375,11 +375,39 @@ export type Database = {
           },
         ]
       }
+      trainer_compensation_rates: {
+        Row: {
+          created_at: string
+          id: string
+          level: Database["public"]["Enums"]["trainer_level"]
+          rate_type: string
+          rate_value: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          level: Database["public"]["Enums"]["trainer_level"]
+          rate_type?: string
+          rate_value?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          level?: Database["public"]["Enums"]["trainer_level"]
+          rate_type?: string
+          rate_value?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       trainers: {
         Row: {
           bio: string | null
           created_at: string
           id: string
+          level: Database["public"]["Enums"]["trainer_level"]
           specialty: string | null
           updated_at: string
           user_id: string
@@ -388,6 +416,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           id?: string
+          level?: Database["public"]["Enums"]["trainer_level"]
           specialty?: string | null
           updated_at?: string
           user_id: string
@@ -396,6 +425,7 @@ export type Database = {
           bio?: string | null
           created_at?: string
           id?: string
+          level?: Database["public"]["Enums"]["trainer_level"]
           specialty?: string | null
           updated_at?: string
           user_id?: string
@@ -440,6 +470,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "trainer" | "trainee"
+      trainer_level: "trainee_trainer" | "junior" | "senior" | "master"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -568,6 +599,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "trainer", "trainee"],
+      trainer_level: ["trainee_trainer", "junior", "senior", "master"],
     },
   },
 } as const
