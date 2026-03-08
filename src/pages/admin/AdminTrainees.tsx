@@ -134,7 +134,7 @@ export default function AdminTrainees() {
     // Update credits on active package if value provided
     const activePkg = editTrainee.trainee_packages.find((p) => p.is_active);
     if (activePkg && editCredits !== "") {
-      const { error: creditErr } = await supabase.from("trainee_packages").update({ remaining_credits: parseInt(editCredits, 10) }).eq("id", activePkg.id);
+      const { error: creditErr } = await supabase.from("trainee_packages").update({ remaining_credits: parseFloat(editCredits) }).eq("id", activePkg.id);
       if (creditErr) { toast.error(t("admin.trainees.updateFailed")); setSaving(false); return; }
     }
 
