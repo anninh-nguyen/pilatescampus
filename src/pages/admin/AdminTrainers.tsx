@@ -105,6 +105,16 @@ export default function AdminTrainers() {
                   <TableCell>{tr.full_name || "—"}</TableCell>
                   <TableCell>{tr.email || "—"}</TableCell>
                   <TableCell>{tr.specialty || "—"}</TableCell>
+                  <TableCell>
+                    <Select value={tr.level} onValueChange={(v) => handleLevelChange(tr.id, v)}>
+                      <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {TRAINER_LEVELS.map((lvl) => (
+                          <SelectItem key={lvl} value={lvl}>{t(`admin.compensation.levels.${lvl}`)}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
                   <TableCell><Button variant="ghost" size="icon" onClick={() => handleDelete(tr)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                 </TableRow>
               ))}
