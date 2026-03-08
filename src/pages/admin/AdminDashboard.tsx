@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Users, UserCheck, CalendarDays, Package } from "lucide-react";
 
 export default function AdminDashboard() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState({ trainees: 0, trainers: 0, upcomingSessions: 0, activePackages: 0 });
 
   useEffect(() => {
@@ -26,20 +28,20 @@ export default function AdminDashboard() {
   }, []);
 
   const cards = [
-    { label: "Total Trainees", value: stats.trainees, icon: Users, color: "text-primary" },
-    { label: "Trainers", value: stats.trainers, icon: UserCheck, color: "text-success" },
-    { label: "Upcoming Sessions", value: stats.upcomingSessions, icon: CalendarDays, color: "text-warning" },
-    { label: "Active Packages", value: stats.activePackages, icon: Package, color: "text-chart-4" },
+    { labelKey: "admin.dashboard.totalTrainees", value: stats.trainees, icon: Users, color: "text-primary" },
+    { labelKey: "admin.dashboard.trainers", value: stats.trainers, icon: UserCheck, color: "text-success" },
+    { labelKey: "admin.dashboard.upcomingSessions", value: stats.upcomingSessions, icon: CalendarDays, color: "text-warning" },
+    { labelKey: "admin.dashboard.activePackages", value: stats.activePackages, icon: Package, color: "text-chart-4" },
   ];
 
   return (
     <DashboardLayout>
-      <h1 className="mb-6 font-serif text-3xl font-bold">Admin Dashboard</h1>
+      <h1 className="mb-6 font-serif text-3xl font-bold">{t("admin.dashboard.title")}</h1>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((c) => (
-          <Card key={c.label}>
+          <Card key={c.labelKey}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{c.label}</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">{t(c.labelKey)}</CardTitle>
               <c.icon className={`h-5 w-5 ${c.color}`} />
             </CardHeader>
             <CardContent>

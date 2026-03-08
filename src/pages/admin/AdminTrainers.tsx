@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ interface TrainerRow {
 }
 
 export default function AdminTrainers() {
+  const { t } = useTranslation();
   const [trainers, setTrainers] = useState<TrainerRow[]>([]);
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
@@ -38,30 +40,19 @@ export default function AdminTrainers() {
 
   const handleAdd = async () => {
     setIsLoading(true);
-    // Find user by email from profiles
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("user_id")
-      .eq("email", email)
-      .single();
-
+    const { data: profile } = await supabase.from("profiles").select("user_id").eq("email", email).single();
     if (!profile) {
-      toast({ title: "User not found", description: "No account with that email exists.", variant: "destructive" });
+      toast({ title: t("admin.trainers.userNotFound"), description: t("admin.trainers.userNotFoundDesc"), variant: "destructive" });
       setIsLoading(false);
       return;
     }
-
-    // Add trainer role
     await supabase.from("user_roles").upsert({ user_id: profile.user_id, role: "trainer" as const });
-    // Remove default trainee role if exists
     await supabase.from("user_roles").delete().eq("user_id", profile.user_id).eq("role", "trainee");
-    // Insert into trainers table
     const { error } = await supabase.from("trainers").insert({ user_id: profile.user_id, specialty });
-
     if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("common.error"), description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Trainer added" });
+      toast({ title: t("admin.trainers.trainerAdded") });
       setOpen(false);
       setEmail("");
       setSpecialty("");
@@ -72,35 +63,34 @@ export default function AdminTrainers() {
 
   const handleDelete = async (trainer: TrainerRow) => {
     await supabase.from("trainers").delete().eq("id", trainer.id);
-    // Restore trainee role
     await supabase.from("user_roles").delete().eq("user_id", trainer.user_id).eq("role", "trainer");
     await supabase.from("user_roles").upsert({ user_id: trainer.user_id, role: "trainee" as const });
-    toast({ title: "Trainer removed" });
+    toast({ title: t("admin.trainers.trainerRemoved") });
     fetchTrainers();
   };
 
   return (
     <DashboardLayout>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-serif text-3xl font-bold">Trainers</h1>
+        <h1 className="font-serif text-3xl font-bold">{t("admin.trainers.title")}</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button><Plus className="mr-2 h-4 w-4" />Add Trainer</Button>
+            <Button><Plus className="mr-2 h-4 w-4" />{t("admin.trainers.addTrainer")}</Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>Add Trainer</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>{t("admin.trainers.addTrainer")}</DialogTitle></DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>User Email</Label>
+                <Label>{t("admin.trainers.userEmail")}</Label>
                 <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="trainer@example.com" />
               </div>
               <div className="space-y-2">
-                <Label>Specialty</Label>
+                <Label>{t("admin.trainers.specialty")}</Label>
                 <Input value={specialty} onChange={(e) => setSpecialty(e.target.value)} placeholder="e.g. Reformer, Mat" />
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={handleAdd} disabled={isLoading}>{isLoading ? "Adding…" : "Add Trainer"}</Button>
+              <Button onClick={handleAdd} disabled={isLoading}>{isLoading ? t("admin.trainers.adding") : t("admin.trainers.addTrainer")}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -110,27 +100,27 @@ export default function AdminTrainers() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Specialty</TableHead>
+                <TableHead>{t("admin.trainers.name")}</TableHead>
+                <TableHead>{t("admin.trainers.email")}</TableHead>
+                <TableHead>{t("admin.trainers.specialty")}</TableHead>
                 <TableHead className="w-[60px]" />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {trainers.map((t) => (
-                <TableRow key={t.id}>
-                  <TableCell>{t.profiles?.full_name || "—"}</TableCell>
-                  <TableCell>{t.profiles?.email || "—"}</TableCell>
-                  <TableCell>{t.specialty || "—"}</TableCell>
+              {trainers.map((tr) => (
+                <TableRow key={tr.id}>
+                  <TableCell>{tr.profiles?.full_name || "—"}</TableCell>
+                  <TableCell>{tr.profiles?.email || "—"}</TableCell>
+                  <TableCell>{tr.specialty || "—"}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(t)}>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(tr)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </TableCell>
                 </TableRow>
               ))}
               {trainers.length === 0 && (
-                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">No trainers yet</TableCell></TableRow>
+                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">{t("admin.trainers.noTrainers")}</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
