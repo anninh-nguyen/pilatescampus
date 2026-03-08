@@ -43,14 +43,14 @@ export default function TraineePackage() {
     const { data } = await supabase.from("referral_codes").select("code").eq("user_id", user.id).single();
     if (data) {
       setReferralCode(data.code);
-      setReferralLink(`${window.location.origin}/login?ref=${data.code}`);
+      setReferralLink(`${window.location.origin}/r/${data.code}`);
     } else {
       // Generate a referral code
       const code = user.id.slice(0, 8).toUpperCase();
       const { error } = await supabase.from("referral_codes").insert({ user_id: user.id, code });
       if (!error) {
         setReferralCode(code);
-        setReferralLink(`${window.location.origin}/login?ref=${code}`);
+        setReferralLink(`${window.location.origin}/r/${code}`);
       }
     }
   };
