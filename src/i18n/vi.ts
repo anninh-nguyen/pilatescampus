@@ -45,6 +45,7 @@ export default {
     trainees: "Học viên",
     packages: "Gói tập",
     schedule: "Lịch tập",
+    pricing: "Giá theo giờ",
     reports: "Báo cáo",
     mySchedule: "Lịch của tôi",
     sessionHistory: "Lịch sử buổi tập",

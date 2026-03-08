@@ -45,6 +45,7 @@ export default {
     trainees: "Trainees",
     packages: "Packages",
     schedule: "Schedule",
+    pricing: "Pricing",
     reports: "Reports",
     mySchedule: "My Schedule",
     sessionHistory: "Session History",
