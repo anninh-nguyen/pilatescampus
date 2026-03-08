@@ -4,7 +4,7 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
@@ -84,16 +84,16 @@ export default function TrainerSchedule() {
                   <TableCell className="capitalize">{s.class_type}</TableCell>
                   <TableCell>
                     {s.bookings.filter((b) => b.status === "confirmed").map((b) => (
-                      <HoverCard key={b.trainee_id}>
-                        <HoverCardTrigger asChild>
+                      <Popover key={b.trainee_id}>
+                        <PopoverTrigger asChild>
                           <Badge variant="secondary" className="mr-1 cursor-pointer">{b.profiles?.full_name || "Trainee"}</Badge>
-                        </HoverCardTrigger>
-                        <HoverCardContent className="w-56 text-sm">
+                        </PopoverTrigger>
+                        <PopoverContent className="w-56 text-sm">
                           <p className="font-semibold">{b.profiles?.full_name}</p>
                           {b.profiles?.email && <p className="text-muted-foreground">{b.profiles.email}</p>}
                           {b.profiles?.phone && <p className="text-muted-foreground">{b.profiles.phone}</p>}
-                        </HoverCardContent>
-                      </HoverCard>
+                        </PopoverContent>
+                      </Popover>
                     ))}
                     {s.bookings.filter((b) => b.status === "confirmed").length === 0 && <span className="text-muted-foreground">{t("trainer.schedule.noBookings")}</span>}
                   </TableCell>
