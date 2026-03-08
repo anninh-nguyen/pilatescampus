@@ -57,6 +57,7 @@ export default {
     bookSessions: "Book Sessions",
     myBookings: "My Bookings",
     myProfile: "My Profile",
+    cancellation: "Cancellation Policy",
   },
   admin: {
     dashboard: {
