@@ -311,6 +311,13 @@ export default {
   notifications: {
     title: "Notifications",
     empty: "No notifications",
+    markAllRead: "Mark all read",
+    types: {
+      booking_reminder: "Booking Reminder",
+      low_credits: "Low Credits",
+      package_expiry: "Expiring Soon",
+      reminder: "Reminder",
+    },
   },
   cancellationInfo: {
     title: "Cancellation Policy",
