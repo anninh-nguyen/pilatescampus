@@ -114,8 +114,11 @@ export default function TraineeBooking() {
       toast({ title: t("trainee.booking.recurringCreated"), description: t("trainee.booking.sessionsBooked", { count: bookings.length }) });
     } else {
       if (remainingCredits < cost) { toast({ title: t("trainee.booking.noCredits"), variant: "destructive" }); setIsBooking(false); return; }
-      const { error } = await supabase.from("bookings").insert({ trainee_id: user.id, class_slot_id: slot.id, trainee_package_id: activePkgId });
-      if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); setIsBooking(false); return; }
+      if (error) {
+        const isDuplicate = error.code === "23505";
+        toast({ title: isDuplicate ? t("trainee.booking.alreadyBooked") : t("common.error"), description: isDuplicate ? t("trainee.booking.alreadyBookedDesc") : error.message, variant: "destructive" });
+        setIsBooking(false); return;
+      }
       await supabase.from("trainee_packages").update({ remaining_credits: Math.round((remainingCredits - cost) * 10) / 10 }).eq("id", activePkgId);
       setRemainingCredits((c) => Math.round((c - cost) * 10) / 10);
       toast({ title: t("trainee.booking.sessionBooked") });

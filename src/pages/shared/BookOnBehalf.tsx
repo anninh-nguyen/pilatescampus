@@ -161,7 +161,12 @@ export default function BookOnBehalf() {
     });
 
     if (error) {
-      toast({ title: t("common.error"), description: error.message, variant: "destructive" });
+      const isDuplicate = error.code === "23505";
+      toast({
+        title: isDuplicate ? t("trainee.booking.alreadyBooked") : t("common.error"),
+        description: isDuplicate ? t("trainee.booking.alreadyBookedDesc") : error.message,
+        variant: "destructive",
+      });
       setIsBooking(false);
       return;
     }
