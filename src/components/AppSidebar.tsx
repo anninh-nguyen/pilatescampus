@@ -28,6 +28,7 @@ import {
   CreditCard,
   BookOpen,
   LogOut,
+  User,
 } from "lucide-react";
 
 const adminLinks = [
