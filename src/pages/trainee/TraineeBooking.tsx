@@ -14,7 +14,7 @@ import { format } from "date-fns";
 
 interface ClassSlot {
   id: string; title: string; start_time: string; end_time: string; capacity: number; class_type: string; booking_count: number;
-  trainers: { profiles: { full_name: string } | null } | null;
+  trainer_name: string;
 }
 
 interface TimePricing {
