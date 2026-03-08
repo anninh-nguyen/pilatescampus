@@ -170,6 +170,20 @@ export default function BookOnBehalf() {
     const newCredits = Math.round((selectedTraineeData.remaining_credits - cost) * 10) / 10;
     await supabase.from("trainee_packages").update({ remaining_credits: newCredits }).eq("id", selectedTraineeData.pkg_id);
 
+    // Notify the trainee
+    const slotTime = format(new Date(slot.start_time), "p");
+    const slotDate = format(new Date(slot.start_time), "MMM d");
+    await supabase.from("notifications").insert({
+      user_id: selectedTraineeData.user_id,
+      title: t("bookOnBehalf.notificationTitle"),
+      message: t("bookOnBehalf.notificationMessage", {
+        class: slot.title,
+        date: slotDate,
+        time: slotTime,
+      }),
+      type: "booking",
+    });
+
     // Update local state
     setTrainees((prev) =>
       prev.map((tr) =>
