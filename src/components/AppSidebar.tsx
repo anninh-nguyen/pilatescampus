@@ -34,6 +34,7 @@ import {
   LogOut,
   User,
   Gift,
+  Mail,
 } from "lucide-react";
 
 const adminLinks = [
