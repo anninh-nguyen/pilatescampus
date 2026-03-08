@@ -144,9 +144,58 @@ export default function AdminTrainees() {
     fetchTrainees();
   };
 
+  const handleInvite = async () => {
+    const emails = inviteEmails
+      .split(/[\n,;]+/)
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+
+    if (emails.length === 0) {
+      toast.error(t("admin.trainees.inviteNoValid"));
+      return;
+    }
+
+    setInviting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await supabase.functions.invoke("invite-users", {
+        body: { emails },
+      });
+
+      if (res.error) {
+        toast.error(res.error.message);
+        setInviting(false);
+        return;
+      }
+
+      const { invited, alreadyExists, failed } = res.data;
+      if (invited.length > 0) {
+        toast.success(t("admin.trainees.inviteSuccess", { count: invited.length }));
+      }
+      if (alreadyExists.length > 0) {
+        toast.warning(t("admin.trainees.inviteAlreadyExists", { count: alreadyExists.length, emails: alreadyExists.join(", ") }));
+      }
+      if (failed.length > 0) {
+        toast.error(t("admin.trainees.inviteFailed", { count: failed.length }));
+      }
+
+      setInviteEmails("");
+      setInviteOpen(false);
+      fetchTrainees();
+    } catch (err) {
+      toast.error(t("common.error"));
+    }
+    setInviting(false);
+  };
+
   return (
     <DashboardLayout>
-      <h1 className="mb-6 font-serif text-3xl font-bold">{t("admin.trainees.title")}</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="font-serif text-3xl font-bold">{t("admin.trainees.title")}</h1>
+        <Button onClick={() => setInviteOpen(true)}>
+          <UserPlus className="mr-2 h-4 w-4" />{t("admin.trainees.inviteTrainees")}
+        </Button>
+      </div>
       <div className="mb-4">
         <ListControls search={lc.search} onSearchChange={lc.setSearch} page={lc.page} totalPages={lc.totalPages} onPageChange={lc.setPage} pageSize={lc.pageSize} onPageSizeChange={lc.setPageSize} totalItems={lc.totalItems} />
       </div>
