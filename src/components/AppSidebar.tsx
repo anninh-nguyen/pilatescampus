@@ -33,6 +33,7 @@ import {
   ClipboardList,
   LogOut,
   User,
+  Gift,
 } from "lucide-react";
 
 const adminLinks = [
@@ -47,6 +48,7 @@ const adminLinks = [
   { labelKey: "nav.compensation", icon: Award, path: "/admin/compensation" },
   { labelKey: "nav.bookForTrainee", icon: UserPlus, path: "/admin/book-for-trainee" },
   { labelKey: "nav.manageBookings", icon: ClipboardList, path: "/admin/manage-bookings" },
+  { labelKey: "nav.promotions", icon: Gift, path: "/admin/promotions" },
 ];
 
 const trainerLinks = [

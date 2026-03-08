@@ -273,6 +273,7 @@ export type Database = {
           full_name: string
           id: string
           phone: string | null
+          referred_by: string | null
           updated_at: string
           user_id: string
         }
@@ -283,6 +284,7 @@ export type Database = {
           full_name?: string
           id?: string
           phone?: string | null
+          referred_by?: string | null
           updated_at?: string
           user_id: string
         }
@@ -293,7 +295,103 @@ export type Database = {
           full_name?: string
           id?: string
           phone?: string | null
+          referred_by?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      promotion_redemptions: {
+        Row: {
+          created_at: string
+          credits_awarded: number
+          id: string
+          metadata: Json | null
+          promotion_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credits_awarded: number
+          id?: string
+          metadata?: Json | null
+          promotion_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credits_awarded?: number
+          id?: string
+          metadata?: Json | null
+          promotion_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotion_redemptions_promotion_id_fkey"
+            columns: ["promotion_id"]
+            isOneToOne: false
+            referencedRelation: "promotions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promotions: {
+        Row: {
+          created_at: string
+          credit_amount: number
+          description: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean
+          name: string
+          start_date: string
+          type: Database["public"]["Enums"]["promotion_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          credit_amount?: number
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          start_date?: string
+          type: Database["public"]["Enums"]["promotion_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          credit_amount?: number
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          start_date?: string
+          type?: Database["public"]["Enums"]["promotion_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
           user_id?: string
         }
         Relationships: []
@@ -450,11 +548,61 @@ export type Database = {
         }
         Relationships: []
       }
+      voucher_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          promotion_id: string
+          redeemed_at: string | null
+          redeemed_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by: string
+          expires_at: string
+          id?: string
+          promotion_id: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          promotion_id?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voucher_codes_promotion_id_fkey"
+            columns: ["promotion_id"]
+            isOneToOne: false
+            referencedRelation: "promotions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      check_first_time_bonus: {
+        Args: { _package_id: string; _user_id: string }
+        Returns: number
+      }
+      check_referral_bonus: {
+        Args: { _new_user_id: string; _package_id: string }
+        Returns: number
+      }
+      check_returning_bonus: { Args: { _user_id: string }; Returns: number }
       get_booking_count: { Args: { _class_slot_id: string }; Returns: number }
       get_user_role: {
         Args: { _user_id: string }
@@ -467,9 +615,19 @@ export type Database = {
         }
         Returns: boolean
       }
+      redeem_voucher: {
+        Args: { _code: string; _user_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "trainer" | "trainee"
+      promotion_type:
+        | "first_time"
+        | "campaign"
+        | "voucher"
+        | "referral"
+        | "returning"
       trainer_level: "trainee_trainer" | "junior" | "senior" | "master"
     }
     CompositeTypes: {
@@ -599,6 +757,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "trainer", "trainee"],
+      promotion_type: [
+        "first_time",
+        "campaign",
+        "voucher",
+        "referral",
+        "returning",
+      ],
       trainer_level: ["trainee_trainer", "junior", "senior", "master"],
     },
   },
