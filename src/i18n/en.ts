@@ -83,6 +83,12 @@ export default {
       creditsLeft: "Credits Left",
       none: "None",
       noTrainees: "No trainees yet",
+      assignPackage: "Assign Package",
+      selectPackage: "Select a package",
+      packageAssigned: "Package assigned successfully",
+      assignFailed: "Failed to assign package",
+      assigning: "Assigning…",
+      actions: "Actions",
     },
     packages: {
       title: "Packages",

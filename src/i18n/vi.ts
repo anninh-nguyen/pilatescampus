@@ -83,6 +83,12 @@ export default {
       creditsLeft: "Số buổi còn lại",
       none: "Không có",
       noTrainees: "Chưa có học viên",
+      assignPackage: "Gán gói tập",
+      selectPackage: "Chọn gói tập",
+      packageAssigned: "Đã gán gói tập thành công",
+      assignFailed: "Gán gói tập thất bại",
+      assigning: "Đang gán…",
+      actions: "Thao tác",
     },
     packages: {
       title: "Gói tập",
