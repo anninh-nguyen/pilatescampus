@@ -93,6 +93,11 @@ export default {
       assignFailed: "Gán gói tập thất bại",
       assigning: "Đang gán…",
       actions: "Thao tác",
+      editTrainee: "Sửa học viên",
+      credits: "Số buổi",
+      updateSuccess: "Cập nhật học viên thành công",
+      updateFailed: "Cập nhật học viên thất bại",
+      saving: "Đang lưu…",
     },
     packages: {
       title: "Gói tập",
