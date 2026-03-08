@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,38 +8,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 
-interface TraineePackage {
-  id: string;
-  remaining_credits: number;
-  expires_at: string;
-  is_active: boolean;
+interface TraineePackageData {
+  id: string; remaining_credits: number; expires_at: string; is_active: boolean;
   packages: { name: string; credit_count: number; description: string | null } | null;
 }
 
 export default function TraineePackage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
-  const [pkg, setPkg] = useState<TraineePackage | null>(null);
+  const [pkg, setPkg] = useState<TraineePackageData | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from("trainee_packages")
-      .select("*, packages(name, credit_count, description)")
-      .eq("trainee_id", user.id)
-      .eq("is_active", true)
-      .single()
-      .then(({ data }) => { if (data) setPkg(data as unknown as TraineePackage); });
+    supabase.from("trainee_packages").select("*, packages(name, credit_count, description)")
+      .eq("trainee_id", user.id).eq("is_active", true).single()
+      .then(({ data }) => { if (data) setPkg(data as unknown as TraineePackageData); });
   }, [user]);
 
   if (!pkg) {
     return (
       <DashboardLayout>
-        <h1 className="mb-6 font-serif text-3xl font-bold">My Package</h1>
-        <Card>
-          <CardContent className="py-8 text-center text-muted-foreground">
-            You don't have an active package. Contact your admin to get one assigned.
-          </CardContent>
-        </Card>
+        <h1 className="mb-6 font-serif text-3xl font-bold">{t("trainee.package.title")}</h1>
+        <Card><CardContent className="py-8 text-center text-muted-foreground">{t("trainee.package.noPackage")}</CardContent></Card>
       </DashboardLayout>
     );
   }
@@ -49,26 +40,26 @@ export default function TraineePackage() {
 
   return (
     <DashboardLayout>
-      <h1 className="mb-6 font-serif text-3xl font-bold">My Package</h1>
+      <h1 className="mb-6 font-serif text-3xl font-bold">{t("trainee.package.title")}</h1>
       <Card className="max-w-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             {pkg.packages?.name}
-            <Badge variant={pkg.is_active ? "default" : "secondary"}>{pkg.is_active ? "Active" : "Inactive"}</Badge>
+            <Badge variant={pkg.is_active ? "default" : "secondary"}>{pkg.is_active ? t("trainee.package.active") : t("trainee.package.inactive")}</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {pkg.packages?.description && <p className="text-muted-foreground">{pkg.packages.description}</p>}
           <div>
             <div className="mb-1 flex justify-between text-sm">
-              <span>Credits remaining</span>
+              <span>{t("trainee.package.creditsRemaining")}</span>
               <span className="font-medium">{pkg.remaining_credits} / {total}</span>
             </div>
             <Progress value={pct} />
           </div>
           <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Sessions used: {used}</span>
-            <span>Expires: {format(new Date(pkg.expires_at), "PPP")}</span>
+            <span>{t("trainee.package.sessionsUsed")}: {used}</span>
+            <span>{t("trainee.package.expires")}: {format(new Date(pkg.expires_at), "PPP")}</span>
           </div>
         </CardContent>
       </Card>

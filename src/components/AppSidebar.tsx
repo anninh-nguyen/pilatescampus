@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Sidebar,
   SidebarContent,
@@ -29,46 +30,47 @@ import {
 } from "lucide-react";
 
 const adminLinks = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
-  { label: "Trainers", icon: UserCheck, path: "/admin/trainers" },
-  { label: "Trainees", icon: Users, path: "/admin/trainees" },
-  { label: "Packages", icon: Package, path: "/admin/packages" },
-  { label: "Schedule", icon: CalendarDays, path: "/admin/schedule" },
-  { label: "Reports", icon: BarChart3, path: "/admin/reports" },
+  { labelKey: "nav.dashboard", icon: LayoutDashboard, path: "/admin" },
+  { labelKey: "nav.trainers", icon: UserCheck, path: "/admin/trainers" },
+  { labelKey: "nav.trainees", icon: Users, path: "/admin/trainees" },
+  { labelKey: "nav.packages", icon: Package, path: "/admin/packages" },
+  { labelKey: "nav.schedule", icon: CalendarDays, path: "/admin/schedule" },
+  { labelKey: "nav.reports", icon: BarChart3, path: "/admin/reports" },
 ];
 
 const trainerLinks = [
-  { label: "My Schedule", icon: Calendar, path: "/trainer" },
-  { label: "Session History", icon: History, path: "/trainer/history" },
-  { label: "Notifications", icon: Bell, path: "/trainer/notifications" },
+  { labelKey: "nav.mySchedule", icon: Calendar, path: "/trainer" },
+  { labelKey: "nav.sessionHistory", icon: History, path: "/trainer/history" },
+  { labelKey: "nav.notifications", icon: Bell, path: "/trainer/notifications" },
 ];
 
 const traineeLinks = [
-  { label: "My Package", icon: CreditCard, path: "/trainee" },
-  { label: "Book Sessions", icon: BookOpen, path: "/trainee/book" },
-  { label: "My Bookings", icon: CalendarDays, path: "/trainee/bookings" },
-  { label: "Notifications", icon: Bell, path: "/trainee/notifications" },
+  { labelKey: "nav.myPackage", icon: CreditCard, path: "/trainee" },
+  { labelKey: "nav.bookSessions", icon: BookOpen, path: "/trainee/book" },
+  { labelKey: "nav.myBookings", icon: CalendarDays, path: "/trainee/bookings" },
+  { labelKey: "nav.notifications", icon: Bell, path: "/trainee/notifications" },
 ];
 
 export function AppSidebar() {
   const { role, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const links = role === "admin" ? adminLinks : role === "trainer" ? trainerLinks : traineeLinks;
-  const roleLabel = role === "admin" ? "Administrator" : role === "trainer" ? "Trainer" : "Trainee";
+  const roleLabel = t(`roles.${role || "trainee"}`);
 
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
         <h2 className="font-serif text-lg font-bold text-sidebar-primary-foreground">
-          Pilates Campus
+          {t("common.appName")}
         </h2>
         <p className="text-xs text-sidebar-foreground/60">{roleLabel}</p>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("common.navigation")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {links.map((link) => (
@@ -78,7 +80,7 @@ export function AppSidebar() {
                     onClick={() => navigate(link.path)}
                   >
                     <link.icon className="h-4 w-4" />
-                    <span>{link.label}</span>
+                    <span>{t(link.labelKey)}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -97,7 +99,7 @@ export function AppSidebar() {
           onClick={() => { signOut(); navigate("/login"); }}
         >
           <LogOut className="mr-2 h-4 w-4" />
-          Sign Out
+          {t("common.signOut")}
         </Button>
       </SidebarFooter>
     </Sidebar>

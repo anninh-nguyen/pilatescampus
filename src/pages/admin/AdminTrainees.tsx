@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -12,6 +13,7 @@ interface TraineeRow {
 }
 
 export default function AdminTrainees() {
+  const { t } = useTranslation();
   const [trainees, setTrainees] = useState<TraineeRow[]>([]);
 
   useEffect(() => {
@@ -20,9 +22,7 @@ export default function AdminTrainees() {
         .from("user_roles")
         .select("user_id, profiles!user_roles_user_id_fkey(full_name, email)")
         .eq("role", "trainee");
-
       if (!data) return;
-      // Fetch packages for each trainee
       const enriched: TraineeRow[] = [];
       for (const row of data) {
         const { data: pkgs } = await supabase
@@ -42,32 +42,32 @@ export default function AdminTrainees() {
 
   return (
     <DashboardLayout>
-      <h1 className="mb-6 font-serif text-3xl font-bold">Trainees</h1>
+      <h1 className="mb-6 font-serif text-3xl font-bold">{t("admin.trainees.title")}</h1>
       <Card>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Active Package</TableHead>
-                <TableHead>Credits Left</TableHead>
+                <TableHead>{t("admin.trainees.name")}</TableHead>
+                <TableHead>{t("admin.trainees.email")}</TableHead>
+                <TableHead>{t("admin.trainees.activePackage")}</TableHead>
+                <TableHead>{t("admin.trainees.creditsLeft")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {trainees.map((t) => {
-                const activePkg = t.trainee_packages.find((p) => p.is_active);
+              {trainees.map((tr) => {
+                const activePkg = tr.trainee_packages.find((p) => p.is_active);
                 return (
-                  <TableRow key={t.user_id}>
-                    <TableCell>{t.profiles?.full_name || "—"}</TableCell>
-                    <TableCell>{t.profiles?.email || "—"}</TableCell>
-                    <TableCell>{activePkg?.packages?.name || <Badge variant="secondary">None</Badge>}</TableCell>
+                  <TableRow key={tr.user_id}>
+                    <TableCell>{tr.profiles?.full_name || "—"}</TableCell>
+                    <TableCell>{tr.profiles?.email || "—"}</TableCell>
+                    <TableCell>{activePkg?.packages?.name || <Badge variant="secondary">{t("admin.trainees.none")}</Badge>}</TableCell>
                     <TableCell>{activePkg ? activePkg.remaining_credits : "—"}</TableCell>
                   </TableRow>
                 );
               })}
               {trainees.length === 0 && (
-                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">No trainees yet</TableCell></TableRow>
+                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">{t("admin.trainees.noTrainees")}</TableCell></TableRow>
               )}
             </TableBody>
           </Table>

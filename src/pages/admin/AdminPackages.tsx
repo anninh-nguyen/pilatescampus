@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,17 +13,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil } from "lucide-react";
 
-type Pkg = {
-  id: string;
-  name: string;
-  description: string | null;
-  credit_count: number;
-  price: number;
-  expiry_days: number;
-  is_active: boolean;
-};
+type Pkg = { id: string; name: string; description: string | null; credit_count: number; price: number; expiry_days: number; is_active: boolean; };
 
 export default function AdminPackages() {
+  const { t } = useTranslation();
   const [packages, setPackages] = useState<Pkg[]>([]);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Pkg | null>(null);
@@ -38,14 +32,13 @@ export default function AdminPackages() {
   const handleSave = async () => {
     if (editing) {
       const { error } = await supabase.from("packages").update(form).eq("id", editing.id);
-      if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+      if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); return; }
     } else {
       const { error } = await supabase.from("packages").insert(form);
-      if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+      if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); return; }
     }
-    toast({ title: editing ? "Package updated" : "Package created" });
-    setOpen(false);
-    setEditing(null);
+    toast({ title: editing ? t("admin.packages.packageUpdated") : t("admin.packages.packageCreated") });
+    setOpen(false); setEditing(null);
     setForm({ name: "", description: "", credit_count: 10, price: 100, expiry_days: 30 });
     fetchPackages();
   };
@@ -64,23 +57,23 @@ export default function AdminPackages() {
   return (
     <DashboardLayout>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-serif text-3xl font-bold">Packages</h1>
+        <h1 className="font-serif text-3xl font-bold">{t("admin.packages.title")}</h1>
         <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}>
           <DialogTrigger asChild>
-            <Button><Plus className="mr-2 h-4 w-4" />New Package</Button>
+            <Button><Plus className="mr-2 h-4 w-4" />{t("admin.packages.newPackage")}</Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>{editing ? "Edit" : "Create"} Package</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>{editing ? t("admin.packages.editPackage") : t("admin.packages.createPackage")}</DialogTitle></DialogHeader>
             <div className="space-y-4">
-              <div className="space-y-2"><Label>Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Description</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+              <div className="space-y-2"><Label>{t("admin.packages.name")}</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
+              <div className="space-y-2"><Label>{t("admin.packages.description")}</Label><Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
               <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2"><Label>Credits</Label><Input type="number" value={form.credit_count} onChange={(e) => setForm({ ...form, credit_count: +e.target.value })} /></div>
-                <div className="space-y-2"><Label>Price ($)</Label><Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: +e.target.value })} /></div>
-                <div className="space-y-2"><Label>Expiry (days)</Label><Input type="number" value={form.expiry_days} onChange={(e) => setForm({ ...form, expiry_days: +e.target.value })} /></div>
+                <div className="space-y-2"><Label>{t("admin.packages.credits")}</Label><Input type="number" value={form.credit_count} onChange={(e) => setForm({ ...form, credit_count: +e.target.value })} /></div>
+                <div className="space-y-2"><Label>{t("admin.packages.price")}</Label><Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: +e.target.value })} /></div>
+                <div className="space-y-2"><Label>{t("admin.packages.expiryDays")}</Label><Input type="number" value={form.expiry_days} onChange={(e) => setForm({ ...form, expiry_days: +e.target.value })} /></div>
               </div>
             </div>
-            <DialogFooter><Button onClick={handleSave}>{editing ? "Update" : "Create"}</Button></DialogFooter>
+            <DialogFooter><Button onClick={handleSave}>{editing ? t("common.update") : t("common.create")}</Button></DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
@@ -89,11 +82,11 @@ export default function AdminPackages() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Credits</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Expiry</TableHead>
-                <TableHead>Active</TableHead>
+                <TableHead>{t("admin.packages.name")}</TableHead>
+                <TableHead>{t("admin.packages.credits")}</TableHead>
+                <TableHead>{t("admin.packages.price")}</TableHead>
+                <TableHead>{t("admin.packages.expiry")}</TableHead>
+                <TableHead>{t("admin.packages.active")}</TableHead>
                 <TableHead className="w-[60px]" />
               </TableRow>
             </TableHeader>
@@ -103,13 +96,13 @@ export default function AdminPackages() {
                   <TableCell className="font-medium">{p.name}</TableCell>
                   <TableCell>{p.credit_count}</TableCell>
                   <TableCell>${p.price}</TableCell>
-                  <TableCell>{p.expiry_days} days</TableCell>
+                  <TableCell>{p.expiry_days} {t("admin.packages.expiryDays").toLowerCase().includes("ngày") ? "" : "days"}</TableCell>
                   <TableCell><Switch checked={p.is_active} onCheckedChange={() => toggleActive(p)} /></TableCell>
                   <TableCell><Button variant="ghost" size="icon" onClick={() => openEdit(p)}><Pencil className="h-4 w-4" /></Button></TableCell>
                 </TableRow>
               ))}
               {packages.length === 0 && (
-                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">No packages yet</TableCell></TableRow>
+                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">{t("admin.packages.noPackages")}</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
