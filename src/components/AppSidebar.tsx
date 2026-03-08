@@ -53,6 +53,7 @@ const trainerLinks = [
   { labelKey: "nav.myProfile", icon: User, path: "/trainer/profile" },
   { labelKey: "nav.notifications", icon: Bell, path: "/trainer/notifications" },
   { labelKey: "nav.bookForTrainee", icon: UserPlus, path: "/trainer/book-for-trainee" },
+  { labelKey: "nav.manageBookings", icon: ClipboardList, path: "/trainer/manage-bookings" },
 ];
 
 const traineeLinks = [
