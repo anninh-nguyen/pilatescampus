@@ -50,7 +50,7 @@ export default function TraineePackage() {
       const { error } = await supabase.from("referral_codes").insert({ user_id: user.id, code });
       if (!error) {
         setReferralCode(code);
-        setReferralLink(`${window.location.origin}/login?ref=${code}`);
+        setReferralLink(`${window.location.origin}/r/${code}`);
       }
     }
   };
