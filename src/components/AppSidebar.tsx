@@ -28,6 +28,7 @@ import {
   Bell,
   CreditCard,
   BookOpen,
+  UserPlus,
   LogOut,
   User,
 } from "lucide-react";
