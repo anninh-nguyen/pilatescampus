@@ -34,6 +34,7 @@ import {
   LogOut,
   User,
   Gift,
+  Mail,
 } from "lucide-react";
 
 const adminLinks = [
@@ -49,6 +50,7 @@ const adminLinks = [
   { labelKey: "nav.bookForTrainee", icon: UserPlus, path: "/admin/book-for-trainee" },
   { labelKey: "nav.manageBookings", icon: ClipboardList, path: "/admin/manage-bookings" },
   { labelKey: "nav.promotions", icon: Gift, path: "/admin/promotions" },
+  { labelKey: "nav.emailSettings", icon: Mail, path: "/admin/email-settings" },
 ];
 
 const trainerLinks = [
