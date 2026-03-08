@@ -287,6 +287,12 @@ export default {
     title: "Notifications",
     empty: "No notifications",
   },
+  cancellationInfo: {
+    title: "Cancellation Policy",
+    atLeast: "≥ {{hours}}h before",
+    lessThan: "< {{hours}}h before",
+    refund: "refund",
+  },
   language: {
     en: "EN",
     vi: "VI",

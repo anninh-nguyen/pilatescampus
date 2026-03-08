@@ -287,6 +287,12 @@ export default {
     title: "Thông báo",
     empty: "Không có thông báo",
   },
+  cancellationInfo: {
+    title: "Chính sách hủy",
+    atLeast: "≥ {{hours}} giờ trước",
+    lessThan: "< {{hours}} giờ trước",
+    refund: "hoàn trả",
+  },
   language: {
     en: "EN",
     vi: "VI",
