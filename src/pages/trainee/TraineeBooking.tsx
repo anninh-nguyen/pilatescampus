@@ -114,6 +114,7 @@ export default function TraineeBooking() {
       toast({ title: t("trainee.booking.recurringCreated"), description: t("trainee.booking.sessionsBooked", { count: bookings.length }) });
     } else {
       if (remainingCredits < cost) { toast({ title: t("trainee.booking.noCredits"), variant: "destructive" }); setIsBooking(false); return; }
+      const { error } = await supabase.from("bookings").insert({ trainee_id: user.id, class_slot_id: slot.id, trainee_package_id: activePkgId });
       if (error) {
         const isDuplicate = error.code === "23505";
         toast({ title: isDuplicate ? t("trainee.booking.alreadyBooked") : t("common.error"), description: isDuplicate ? t("trainee.booking.alreadyBookedDesc") : error.message, variant: "destructive" });
