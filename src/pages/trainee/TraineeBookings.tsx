@@ -13,7 +13,6 @@ import { format, differenceInHours } from "date-fns";
 import { ListControls, useListControls } from "@/components/ListControls";
 
 interface CancellationTier { hours_before: number; refund_percentage: number; }
-import { ListControls, useListControls } from "@/components/ListControls";
 
 interface Booking {
   id: string; status: string; is_recurring: boolean; trainee_package_id: string;
