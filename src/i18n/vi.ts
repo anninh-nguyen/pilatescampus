@@ -59,6 +59,7 @@ export default {
     myProfile: "Hồ sơ của tôi",
     cancellation: "Chính sách hủy",
     bookForTrainee: "Đặt cho học viên",
+    manageBookings: "Quản lý đặt chỗ",
   },
   bookOnBehalf: {
     title: "Đặt lịch thay học viên",
@@ -67,6 +68,17 @@ export default {
     selectTraineeFirst: "Vui lòng chọn học viên trước",
     noPackage: "chưa có gói",
     bookedSuccess: "Đã đặt buổi tập cho {{name}}",
+  },
+  manageBookings: {
+    title: "Quản lý đặt chỗ",
+    trainee: "Học viên",
+    class: "Lớp",
+    dateTime: "Ngày & Giờ",
+    type: "Loại",
+    status: "Trạng thái",
+    noBookings: "Không có đặt chỗ đã xác nhận",
+    cancelledFor: "Đã hủy đặt chỗ cho {{name}}",
+    noRefundApplied: "Không hoàn trả (quá gần giờ tập).",
   },
   admin: {
     dashboard: {
