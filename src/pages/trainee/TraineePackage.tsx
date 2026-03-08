@@ -43,7 +43,7 @@ export default function TraineePackage() {
     const { data } = await supabase.from("referral_codes").select("code").eq("user_id", user.id).single();
     if (data) {
       setReferralCode(data.code);
-      setReferralLink(`${window.location.origin}/login?ref=${data.code}`);
+      setReferralLink(`${window.location.origin}/r/${data.code}`);
     } else {
       // Generate a referral code
       const code = user.id.slice(0, 8).toUpperCase();
