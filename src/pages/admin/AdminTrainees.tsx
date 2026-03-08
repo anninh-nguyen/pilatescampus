@@ -80,7 +80,18 @@ export default function AdminTrainees() {
     setAssigning(true);
     const pkg = packages.find((p) => p.id === selectedPackageId);
     if (!pkg) return;
-    const { error } = await supabase.from("trainee_packages").insert({ trainee_id: selectedTrainee.user_id, package_id: selectedPackageId, remaining_credits: pkg.credit_count, expires_at: addDays(new Date(), pkg.expiry_days).toISOString() });
+
+    // Get current active package credits to make them cumulative
+    let currentCredits = 0;
+    const { data: activePkgs } = await supabase.from("trainee_packages").select("remaining_credits").eq("trainee_id", selectedTrainee.user_id).eq("is_active", true);
+    if (activePkgs && activePkgs.length > 0) {
+      currentCredits = activePkgs.reduce((sum, p) => sum + Number(p.remaining_credits), 0);
+      // Deactivate old packages
+      await supabase.from("trainee_packages").update({ is_active: false }).eq("trainee_id", selectedTrainee.user_id).eq("is_active", true);
+    }
+
+    const totalCredits = Math.round((currentCredits + Number(pkg.credit_count)) * 10) / 10;
+    const { error } = await supabase.from("trainee_packages").insert({ trainee_id: selectedTrainee.user_id, package_id: selectedPackageId, remaining_credits: totalCredits, expires_at: addDays(new Date(), pkg.expiry_days).toISOString() });
     setAssigning(false);
     if (error) { toast.error(t("admin.trainees.assignFailed")); } else { toast.success(t("admin.trainees.packageAssigned")); setDialogOpen(false); fetchTrainees(); }
   };
