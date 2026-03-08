@@ -58,6 +58,15 @@ export default {
     myBookings: "My Bookings",
     myProfile: "My Profile",
     cancellation: "Cancellation Policy",
+    bookForTrainee: "Book for Trainee",
+  },
+  bookOnBehalf: {
+    title: "Book on Behalf of Trainee",
+    selectTrainee: "Select Trainee",
+    chooseTrainee: "Choose a trainee…",
+    selectTraineeFirst: "Please select a trainee first",
+    noPackage: "no package",
+    bookedSuccess: "Session booked for {{name}}",
   },
   admin: {
     dashboard: {

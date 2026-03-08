@@ -23,6 +23,7 @@ import TraineePackage from "./pages/trainee/TraineePackage";
 import TraineeBooking from "./pages/trainee/TraineeBooking";
 import TraineeBookings from "./pages/trainee/TraineeBookings";
 import Notifications from "./pages/shared/Notifications";
+import BookOnBehalf from "./pages/shared/BookOnBehalf";
 
 const queryClient = new QueryClient();
 
@@ -47,12 +48,14 @@ const App = () => (
             <Route path="/admin/pricing" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPricing /></ProtectedRoute>} />
             <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={["admin"]}><AdminReports /></ProtectedRoute>} />
             <Route path="/admin/cancellation" element={<ProtectedRoute allowedRoles={["admin"]}><AdminCancellation /></ProtectedRoute>} />
+            <Route path="/admin/book-for-trainee" element={<ProtectedRoute allowedRoles={["admin"]}><BookOnBehalf /></ProtectedRoute>} />
 
             {/* Trainer routes */}
             <Route path="/trainer" element={<ProtectedRoute allowedRoles={["trainer"]}><TrainerSchedule /></ProtectedRoute>} />
             <Route path="/trainer/history" element={<ProtectedRoute allowedRoles={["trainer"]}><TrainerHistory /></ProtectedRoute>} />
             <Route path="/trainer/profile" element={<ProtectedRoute allowedRoles={["trainer"]}><TrainerProfile /></ProtectedRoute>} />
             <Route path="/trainer/notifications" element={<ProtectedRoute allowedRoles={["trainer"]}><Notifications /></ProtectedRoute>} />
+            <Route path="/trainer/book-for-trainee" element={<ProtectedRoute allowedRoles={["trainer"]}><BookOnBehalf /></ProtectedRoute>} />
 
             {/* Trainee routes */}
             <Route path="/trainee" element={<ProtectedRoute allowedRoles={["trainee"]}><TraineePackage /></ProtectedRoute>} />

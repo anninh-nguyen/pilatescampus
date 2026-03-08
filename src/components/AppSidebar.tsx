@@ -28,6 +28,7 @@ import {
   Bell,
   CreditCard,
   BookOpen,
+  UserPlus,
   LogOut,
   User,
 } from "lucide-react";
@@ -41,6 +42,7 @@ const adminLinks = [
   { labelKey: "nav.pricing", icon: DollarSign, path: "/admin/pricing" },
   { labelKey: "nav.reports", icon: BarChart3, path: "/admin/reports" },
   { labelKey: "nav.cancellation", icon: ShieldAlert, path: "/admin/cancellation" },
+  { labelKey: "nav.bookForTrainee", icon: UserPlus, path: "/admin/book-for-trainee" },
 ];
 
 const trainerLinks = [
@@ -48,6 +50,7 @@ const trainerLinks = [
   { labelKey: "nav.sessionHistory", icon: History, path: "/trainer/history" },
   { labelKey: "nav.myProfile", icon: User, path: "/trainer/profile" },
   { labelKey: "nav.notifications", icon: Bell, path: "/trainer/notifications" },
+  { labelKey: "nav.bookForTrainee", icon: UserPlus, path: "/trainer/book-for-trainee" },
 ];
 
 const traineeLinks = [
