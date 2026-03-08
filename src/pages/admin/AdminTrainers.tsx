@@ -95,6 +95,7 @@ export default function AdminTrainers() {
                 <TableHead>{t("admin.trainers.name")}</TableHead>
                 <TableHead>{t("admin.trainers.email")}</TableHead>
                 <TableHead>{t("admin.trainers.specialty")}</TableHead>
+                <TableHead>{t("admin.trainers.level")}</TableHead>
                 <TableHead className="w-[60px]" />
               </TableRow>
             </TableHeader>
