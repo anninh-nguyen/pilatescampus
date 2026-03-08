@@ -24,6 +24,7 @@ import TraineeBooking from "./pages/trainee/TraineeBooking";
 import TraineeBookings from "./pages/trainee/TraineeBookings";
 import Notifications from "./pages/shared/Notifications";
 import BookOnBehalf from "./pages/shared/BookOnBehalf";
+import ManageBookings from "./pages/shared/ManageBookings";
 
 const queryClient = new QueryClient();
 
