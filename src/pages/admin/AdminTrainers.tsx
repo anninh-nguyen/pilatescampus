@@ -7,12 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2 } from "lucide-react";
 import { ListControls, useListControls } from "@/components/ListControls";
 
-interface TrainerRow { id: string; user_id: string; specialty: string | null; bio: string | null; full_name: string; email: string; }
+const TRAINER_LEVELS = ["trainee_trainer", "junior", "senior", "master"] as const;
+
+interface TrainerRow { id: string; user_id: string; specialty: string | null; bio: string | null; level: string; full_name: string; email: string; }
 
 export default function AdminTrainers() {
   const { t } = useTranslation();
