@@ -63,6 +63,23 @@ export default function Login() {
     setIsLoading(false);
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast({ title: t("login.enterEmailFirst"), variant: "destructive" });
+      return;
+    }
+    setIsLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) {
+      toast({ title: t("login.resetFailed"), description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: t("login.resetEmailSent"), description: t("login.resetEmailSentDesc") });
+    }
+    setIsLoading(false);
+  };
+
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     const result = await lovable.auth.signInWithOAuth("google", {
