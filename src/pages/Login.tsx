@@ -111,6 +111,11 @@ export default function Login() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-3">
+                  <div className="flex w-full justify-end">
+                    <button type="button" className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline" onClick={handleForgotPassword} disabled={isLoading}>
+                      {t("login.forgotPassword")}
+                    </button>
+                  </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? t("login.signingIn") : t("login.signIn")}
                   </Button>
