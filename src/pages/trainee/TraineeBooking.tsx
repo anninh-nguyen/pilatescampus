@@ -63,12 +63,20 @@ export default function TraineeBooking() {
     const fetchSlots = async () => {
       const dayStart = new Date(date); dayStart.setHours(0, 0, 0, 0);
       const dayEnd = new Date(date); dayEnd.setHours(23, 59, 59, 999);
-      const { data } = await supabase.from("class_slots").select("*, trainers(profiles:profiles!trainers_user_id_fkey(full_name))")
+      const { data } = await supabase.from("class_slots").select("*, trainers(user_id)")
         .gte("start_time", dayStart.toISOString()).lte("start_time", dayEnd.toISOString()).order("start_time", { ascending: true });
       if (data) {
-        const enriched = await Promise.all(data.map(async (slot) => {
+        // Fetch trainer profile names separately
+        const trainerUserIds = [...new Set(data.map((s: any) => s.trainers?.user_id).filter(Boolean))];
+        let profileMap = new Map<string, string>();
+        if (trainerUserIds.length > 0) {
+          const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", trainerUserIds);
+          if (profiles) profiles.forEach((p) => profileMap.set(p.user_id, p.full_name));
+        }
+        const enriched = await Promise.all(data.map(async (slot: any) => {
           const { count } = await supabase.from("bookings").select("id", { count: "exact", head: true }).eq("class_slot_id", slot.id).eq("status", "confirmed");
-          return { ...slot, booking_count: count || 0 } as unknown as ClassSlot;
+          const trainerName = slot.trainers?.user_id ? profileMap.get(slot.trainers.user_id) || "" : "";
+          return { ...slot, booking_count: count || 0, trainer_name: trainerName } as unknown as ClassSlot;
         }));
         setSlots(enriched);
       }
