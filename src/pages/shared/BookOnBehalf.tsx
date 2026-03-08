@@ -167,7 +167,7 @@ export default function BookOnBehalf() {
     }
 
     // Deduct credits
-    const newCredits = selectedTraineeData.remaining_credits - cost;
+    const newCredits = Math.round((selectedTraineeData.remaining_credits - cost) * 10) / 10;
     await supabase.from("trainee_packages").update({ remaining_credits: newCredits }).eq("id", selectedTraineeData.pkg_id);
 
     // Update local state
