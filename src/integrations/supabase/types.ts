@@ -615,10 +615,9 @@ export type Database = {
         }
         Returns: boolean
       }
-      redeem_voucher: {
-        Args: { _code: string; _user_id: string }
-        Returns: Json
-      }
+      redeem_voucher:
+        | { Args: { _code: string }; Returns: Json }
+        | { Args: { _code: string; _user_id: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "trainer" | "trainee"

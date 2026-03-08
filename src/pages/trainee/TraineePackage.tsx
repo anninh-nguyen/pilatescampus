@@ -60,7 +60,6 @@ export default function TraineePackage() {
     setRedeeming(true);
     const { data, error } = await supabase.rpc("redeem_voucher", {
       _code: voucherCode.trim().toUpperCase(),
-      _user_id: user.id,
     });
     setRedeeming(false);
 
