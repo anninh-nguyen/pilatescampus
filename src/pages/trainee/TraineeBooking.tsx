@@ -55,8 +55,8 @@ export default function TraineeBooking() {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("trainee_packages").select("id, remaining_credits").eq("trainee_id", user.id).eq("is_active", true).single()
-      .then(({ data }) => { if (data) { setActivePkgId(data.id); setRemainingCredits(data.remaining_credits); } });
+    supabase.from("trainee_packages").select("id, remaining_credits").eq("trainee_id", user.id).eq("is_active", true).order("created_at", { ascending: false }).limit(1)
+      .then(({ data }) => { if (data && data.length > 0) { setActivePkgId(data[0].id); setRemainingCredits(data[0].remaining_credits); } });
   }, [user]);
 
   useEffect(() => {
