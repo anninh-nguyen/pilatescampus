@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -94,7 +95,8 @@ export default function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-8">
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-1">
+          <ThemeSwitcher />
           <LanguageSwitcher />
         </div>
         <div className="text-center">
