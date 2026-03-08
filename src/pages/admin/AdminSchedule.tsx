@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, CalendarIcon, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { ListControls, useListControls } from "@/components/ListControls";
 
 interface Trainer { id: string; user_id: string; specialty: string | null; full_name: string; }
 interface ClassSlot { id: string; title: string; trainer_id: string; start_time: string; end_time: string; capacity: number; class_type: string; trainer_name: string; }
@@ -28,6 +29,10 @@ export default function AdminSchedule() {
   const [form, setForm] = useState({ title: "", trainer_id: "", startHour: "09", startMin: "00", endHour: "10", endMin: "00", capacity: 8, class_type: "group" });
   const { toast } = useToast();
 
+  const lc = useListControls<ClassSlot>(slots, (s, q) =>
+    s.title.toLowerCase().includes(q) || s.trainer_name.toLowerCase().includes(q) || s.class_type.toLowerCase().includes(q)
+  );
+
   const fetchTrainers = async () => {
     const { data: trainerData } = await supabase.from("trainers").select("id, user_id, specialty");
     if (!trainerData || trainerData.length === 0) { setTrainers([]); return; }
@@ -40,7 +45,6 @@ export default function AdminSchedule() {
   const fetchSlots = async () => {
     const { data: slotData } = await supabase.from("class_slots").select("*").order("start_time", { ascending: true });
     if (!slotData || slotData.length === 0) { setSlots([]); return; }
-    // Get trainer ids to resolve names
     const trainerIds = [...new Set(slotData.map((s) => s.trainer_id))];
     const { data: trainerRows } = await supabase.from("trainers").select("id, user_id").in("id", trainerIds);
     if (!trainerRows) { setSlots(slotData.map((s) => ({ ...s, trainer_name: "—" }))); return; }
@@ -58,8 +62,7 @@ export default function AdminSchedule() {
     const endTime = new Date(date); endTime.setHours(+form.endHour, +form.endMin, 0, 0);
     const { error } = await supabase.from("class_slots").insert({ title: form.title, trainer_id: form.trainer_id, start_time: startTime.toISOString(), end_time: endTime.toISOString(), capacity: form.capacity, class_type: form.class_type });
     if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); return; }
-    toast({ title: t("admin.schedule.slotCreated") });
-    setOpen(false); fetchSlots();
+    toast({ title: t("admin.schedule.slotCreated") }); setOpen(false); fetchSlots();
   };
 
   const handleDelete = async (id: string) => {
@@ -133,6 +136,9 @@ export default function AdminSchedule() {
           </DialogContent>
         </Dialog>
       </div>
+      <div className="mb-4">
+        <ListControls search={lc.search} onSearchChange={lc.setSearch} page={lc.page} totalPages={lc.totalPages} onPageChange={lc.setPage} pageSize={lc.pageSize} onPageSizeChange={lc.setPageSize} totalItems={lc.totalItems} />
+      </div>
       <Card>
         <CardContent className="p-0">
           <Table>
@@ -147,7 +153,7 @@ export default function AdminSchedule() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {slots.map((s) => (
+              {lc.paginated.map((s) => (
                 <TableRow key={s.id}>
                   <TableCell className="font-medium">{s.title}</TableCell>
                   <TableCell>{s.trainer_name}</TableCell>
@@ -157,7 +163,7 @@ export default function AdminSchedule() {
                   <TableCell><Button variant="ghost" size="icon" onClick={() => handleDelete(s.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                 </TableRow>
               ))}
-              {slots.length === 0 && (
+              {lc.paginated.length === 0 && (
                 <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">{t("admin.schedule.noClasses")}</TableCell></TableRow>
               )}
             </TableBody>

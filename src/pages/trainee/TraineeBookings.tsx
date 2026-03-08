@@ -5,10 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { format, differenceInHours } from "date-fns";
+import { ListControls, useListControls } from "@/components/ListControls";
 
 interface Booking {
   id: string; status: string; is_recurring: boolean; trainee_package_id: string;
@@ -20,6 +22,13 @@ export default function TraineeBookings() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const filteredByStatus = statusFilter === "all" ? bookings : bookings.filter((b) => b.status === statusFilter);
+
+  const lc = useListControls<Booking>(filteredByStatus, (b, q) =>
+    (b.class_slots?.title || "").toLowerCase().includes(q) || b.status.toLowerCase().includes(q)
+  );
 
   const fetchBookings = async () => {
     if (!user) return;
@@ -40,9 +49,23 @@ export default function TraineeBookings() {
     fetchBookings();
   };
 
+  const statusFilterElement = (
+    <Select value={statusFilter} onValueChange={setStatusFilter}>
+      <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">{t("common.all")}</SelectItem>
+        <SelectItem value="confirmed">Confirmed</SelectItem>
+        <SelectItem value="cancelled">Cancelled</SelectItem>
+      </SelectContent>
+    </Select>
+  );
+
   return (
     <DashboardLayout>
       <h1 className="mb-6 font-serif text-3xl font-bold">{t("trainee.bookings.title")}</h1>
+      <div className="mb-4">
+        <ListControls search={lc.search} onSearchChange={lc.setSearch} page={lc.page} totalPages={lc.totalPages} onPageChange={lc.setPage} pageSize={lc.pageSize} onPageSizeChange={lc.setPageSize} totalItems={lc.totalItems} filterElement={statusFilterElement} />
+      </div>
       <Card>
         <CardContent className="p-0">
           <Table>
@@ -56,7 +79,7 @@ export default function TraineeBookings() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {bookings.map((b) => (
+              {lc.paginated.map((b) => (
                 <TableRow key={b.id}>
                   <TableCell className="font-medium">{b.class_slots?.title || "—"}</TableCell>
                   <TableCell>{b.class_slots ? format(new Date(b.class_slots.start_time), "PPP p") : "—"}</TableCell>
@@ -74,7 +97,7 @@ export default function TraineeBookings() {
                   </TableCell>
                 </TableRow>
               ))}
-              {bookings.length === 0 && (
+              {lc.paginated.length === 0 && (
                 <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">{t("trainee.bookings.noBookings")}</TableCell></TableRow>
               )}
             </TableBody>

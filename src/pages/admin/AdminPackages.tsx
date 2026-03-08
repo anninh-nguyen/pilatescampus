@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil } from "lucide-react";
+import { ListControls, useListControls } from "@/components/ListControls";
 
 type Pkg = { id: string; name: string; description: string | null; credit_count: number; price: number; expiry_days: number; is_active: boolean; };
 
@@ -22,6 +23,8 @@ export default function AdminPackages() {
   const [editing, setEditing] = useState<Pkg | null>(null);
   const [form, setForm] = useState({ name: "", description: "", credit_count: 10, price: 100, expiry_days: 30 });
   const { toast } = useToast();
+
+  const lc = useListControls<Pkg>(packages, (p, q) => p.name.toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q));
 
   const fetchPackages = async () => {
     const { data } = await supabase.from("packages").select("*").order("created_at", { ascending: false });
@@ -43,25 +46,15 @@ export default function AdminPackages() {
     fetchPackages();
   };
 
-  const toggleActive = async (pkg: Pkg) => {
-    await supabase.from("packages").update({ is_active: !pkg.is_active }).eq("id", pkg.id);
-    fetchPackages();
-  };
-
-  const openEdit = (pkg: Pkg) => {
-    setEditing(pkg);
-    setForm({ name: pkg.name, description: pkg.description || "", credit_count: pkg.credit_count, price: pkg.price, expiry_days: pkg.expiry_days });
-    setOpen(true);
-  };
+  const toggleActive = async (pkg: Pkg) => { await supabase.from("packages").update({ is_active: !pkg.is_active }).eq("id", pkg.id); fetchPackages(); };
+  const openEdit = (pkg: Pkg) => { setEditing(pkg); setForm({ name: pkg.name, description: pkg.description || "", credit_count: pkg.credit_count, price: pkg.price, expiry_days: pkg.expiry_days }); setOpen(true); };
 
   return (
     <DashboardLayout>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-serif text-3xl font-bold">{t("admin.packages.title")}</h1>
         <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setEditing(null); }}>
-          <DialogTrigger asChild>
-            <Button><Plus className="mr-2 h-4 w-4" />{t("admin.packages.newPackage")}</Button>
-          </DialogTrigger>
+          <DialogTrigger asChild><Button><Plus className="mr-2 h-4 w-4" />{t("admin.packages.newPackage")}</Button></DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>{editing ? t("admin.packages.editPackage") : t("admin.packages.createPackage")}</DialogTitle></DialogHeader>
             <div className="space-y-4">
@@ -77,6 +70,9 @@ export default function AdminPackages() {
           </DialogContent>
         </Dialog>
       </div>
+      <div className="mb-4">
+        <ListControls search={lc.search} onSearchChange={lc.setSearch} page={lc.page} totalPages={lc.totalPages} onPageChange={lc.setPage} pageSize={lc.pageSize} onPageSizeChange={lc.setPageSize} totalItems={lc.totalItems} />
+      </div>
       <Card>
         <CardContent className="p-0">
           <Table>
@@ -91,7 +87,7 @@ export default function AdminPackages() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {packages.map((p) => (
+              {lc.paginated.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell className="font-medium">{p.name}</TableCell>
                   <TableCell>{p.credit_count}</TableCell>
@@ -101,7 +97,7 @@ export default function AdminPackages() {
                   <TableCell><Button variant="ghost" size="icon" onClick={() => openEdit(p)}><Pencil className="h-4 w-4" /></Button></TableCell>
                 </TableRow>
               ))}
-              {packages.length === 0 && (
+              {lc.paginated.length === 0 && (
                 <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">{t("admin.packages.noPackages")}</TableCell></TableRow>
               )}
             </TableBody>
