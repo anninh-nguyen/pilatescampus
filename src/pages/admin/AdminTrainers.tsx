@@ -43,7 +43,7 @@ export default function AdminTrainers() {
   };
 
   const handleLevelChange = async (trainerId: string, newLevel: string) => {
-    const { error } = await supabase.from("trainers").update({ level: newLevel }).eq("id", trainerId);
+    const { error } = await supabase.from("trainers").update({ level: newLevel as any }).eq("id", trainerId);
     if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); }
     else { toast({ title: t("admin.trainers.levelUpdated") }); fetchTrainers(); }
   };
