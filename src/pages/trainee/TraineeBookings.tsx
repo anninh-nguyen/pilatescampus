@@ -68,7 +68,7 @@ export default function TraineeBookings() {
     if (pkg) {
       // Determine the credit cost of the booking (default 1)
       const creditCost = 1; // Base cost; could be enhanced to store actual cost on booking
-      const refunded = Math.round((creditCost * refundPct) / 100);
+      const refunded = Math.round(((creditCost * refundPct) / 100) * 10) / 10;
       if (refunded > 0) {
         await supabase.from("trainee_packages").update({ remaining_credits: pkg.remaining_credits + refunded }).eq("id", booking.trainee_package_id);
       }
