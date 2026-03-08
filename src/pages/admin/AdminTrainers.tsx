@@ -31,15 +31,21 @@ export default function AdminTrainers() {
   );
 
   const fetchTrainers = async () => {
-    const { data: trainerData } = await supabase.from("trainers").select("id, user_id, specialty, bio").order("created_at", { ascending: false });
+    const { data: trainerData } = await supabase.from("trainers").select("id, user_id, specialty, bio, level").order("created_at", { ascending: false });
     if (!trainerData || trainerData.length === 0) { setTrainers([]); return; }
     const userIds = trainerData.map((t) => t.user_id);
     const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email").in("user_id", userIds);
     const profileMap = new Map((profiles || []).map((p) => [p.user_id, p]));
     setTrainers(trainerData.map((tr) => {
       const profile = profileMap.get(tr.user_id);
-      return { ...tr, full_name: profile?.full_name || "", email: profile?.email || "" };
+      return { ...tr, level: (tr as any).level || "trainee_trainer", full_name: profile?.full_name || "", email: profile?.email || "" };
     }));
+  };
+
+  const handleLevelChange = async (trainerId: string, newLevel: string) => {
+    const { error } = await supabase.from("trainers").update({ level: newLevel }).eq("id", trainerId);
+    if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); }
+    else { toast({ title: t("admin.trainers.levelUpdated") }); fetchTrainers(); }
   };
 
   useEffect(() => { fetchTrainers(); }, []);
