@@ -311,6 +311,13 @@ export default {
   notifications: {
     title: "Thông báo",
     empty: "Không có thông báo",
+    markAllRead: "Đánh dấu tất cả đã đọc",
+    types: {
+      booking_reminder: "Nhắc buổi tập",
+      low_credits: "Sắp hết buổi",
+      package_expiry: "Sắp hết hạn",
+      reminder: "Nhắc nhở",
+    },
   },
   cancellationInfo: {
     title: "Chính sách hủy",
