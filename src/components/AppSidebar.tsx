@@ -22,6 +22,7 @@ import {
   CalendarDays,
   DollarSign,
   BarChart3,
+  ShieldAlert,
   Calendar,
   History,
   Bell,
