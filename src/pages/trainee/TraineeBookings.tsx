@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { format, differenceInHours } from "date-fns";
 import { ListControls, useListControls } from "@/components/ListControls";
+import { CancellationPolicyInfo } from "@/components/CancellationPolicyInfo";
 
 interface CancellationTier { hours_before: number; refund_percentage: number; }
 
