@@ -347,6 +347,8 @@ export default {
       recurringCreated: "Recurring bookings created",
       sessionsBooked: "{{count}} sessions booked.",
       sessionBooked: "Session booked!",
+      alreadyBooked: "Already booked",
+      alreadyBookedDesc: "This trainee is already booked for this class.",
       noClasses: "No classes on this day",
     },
     bookings: {

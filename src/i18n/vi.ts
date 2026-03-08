@@ -347,6 +347,8 @@ export default {
       recurringCreated: "Đã tạo đặt định kỳ",
       sessionsBooked: "Đã đặt {{count}} buổi tập.",
       sessionBooked: "Đã đặt buổi tập!",
+      alreadyBooked: "Đã đặt rồi",
+      alreadyBookedDesc: "Học viên đã được đặt cho lớp này.",
       noClasses: "Không có lớp nào trong ngày này",
     },
     bookings: {
