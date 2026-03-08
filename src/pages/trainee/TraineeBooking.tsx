@@ -17,6 +17,25 @@ interface ClassSlot {
   trainers: { profiles: { full_name: string } | null } | null;
 }
 
+interface TimePricing {
+  start_time: string;
+  end_time: string;
+  credit_cost: number;
+}
+
+function getCreditCost(slotStartTime: string, pricingPeriods: TimePricing[]): number {
+  const slotDate = new Date(slotStartTime);
+  const slotTimeStr = `${String(slotDate.getHours()).padStart(2, "0")}:${String(slotDate.getMinutes()).padStart(2, "0")}`;
+  for (const p of pricingPeriods) {
+    const pStart = p.start_time.slice(0, 5);
+    const pEnd = p.end_time.slice(0, 5);
+    if (slotTimeStr >= pStart && slotTimeStr < pEnd) {
+      return p.credit_cost;
+    }
+  }
+  return 1; // default
+}
+
 export default function TraineeBooking() {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -27,6 +46,12 @@ export default function TraineeBooking() {
   const [activePkgId, setActivePkgId] = useState<string | null>(null);
   const [remainingCredits, setRemainingCredits] = useState(0);
   const [isBooking, setIsBooking] = useState(false);
+  const [pricingPeriods, setPricingPeriods] = useState<TimePricing[]>([]);
+
+  useEffect(() => {
+    supabase.from("time_pricing").select("start_time, end_time, credit_cost").order("start_time")
+      .then(({ data }) => { if (data) setPricingPeriods(data as unknown as TimePricing[]); });
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -55,6 +80,9 @@ export default function TraineeBooking() {
     if (!user || !activePkgId) { toast({ title: t("trainee.booking.noActivePackage"), description: t("trainee.booking.needPackage"), variant: "destructive" }); return; }
     if (slot.booking_count >= slot.capacity) { toast({ title: t("trainee.booking.classFull"), description: t("trainee.booking.classFullDesc"), variant: "destructive" }); return; }
     setIsBooking(true);
+
+    const cost = getCreditCost(slot.start_time, pricingPeriods);
+
     if (recurring) {
       let creditsLeft = remainingCredits;
       const { data: futureSlots } = await supabase.from("class_slots").select("id, start_time").gte("start_time", new Date().toISOString()).order("start_time", { ascending: true });
@@ -63,7 +91,12 @@ export default function TraineeBooking() {
       const targetMin = new Date(slot.start_time).getMinutes();
       const matchingSlots = (futureSlots || []).filter((s) => { const d = new Date(s.start_time); return d.getDay() === targetDay && d.getHours() === targetHour && d.getMinutes() === targetMin; });
       const bookings: any[] = [];
-      for (const s of matchingSlots) { if (creditsLeft <= 0) break; bookings.push({ trainee_id: user.id, class_slot_id: s.id, trainee_package_id: activePkgId, is_recurring: true }); creditsLeft--; }
+      for (const s of matchingSlots) {
+        const slotCost = getCreditCost(s.start_time, pricingPeriods);
+        if (creditsLeft < slotCost) break;
+        bookings.push({ trainee_id: user.id, class_slot_id: s.id, trainee_package_id: activePkgId, is_recurring: true });
+        creditsLeft -= slotCost;
+      }
       if (bookings.length === 0) { toast({ title: t("trainee.booking.noMatchingSlots"), description: t("trainee.booking.noMatchingSlotsDesc"), variant: "destructive" }); setIsBooking(false); return; }
       const { error } = await supabase.from("bookings").insert(bookings);
       if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); setIsBooking(false); return; }
@@ -71,11 +104,11 @@ export default function TraineeBooking() {
       setRemainingCredits(creditsLeft);
       toast({ title: t("trainee.booking.recurringCreated"), description: t("trainee.booking.sessionsBooked", { count: bookings.length }) });
     } else {
-      if (remainingCredits <= 0) { toast({ title: t("trainee.booking.noCredits"), variant: "destructive" }); setIsBooking(false); return; }
+      if (remainingCredits < cost) { toast({ title: t("trainee.booking.noCredits"), variant: "destructive" }); setIsBooking(false); return; }
       const { error } = await supabase.from("bookings").insert({ trainee_id: user.id, class_slot_id: slot.id, trainee_package_id: activePkgId });
       if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); setIsBooking(false); return; }
-      await supabase.from("trainee_packages").update({ remaining_credits: remainingCredits - 1 }).eq("id", activePkgId);
-      setRemainingCredits((c) => c - 1);
+      await supabase.from("trainee_packages").update({ remaining_credits: remainingCredits - cost }).eq("id", activePkgId);
+      setRemainingCredits((c) => c - cost);
       toast({ title: t("trainee.booking.sessionBooked") });
     }
     setIsBooking(false);
@@ -95,6 +128,7 @@ export default function TraineeBooking() {
           <h2 className="font-serif text-xl font-semibold">{t("trainee.booking.classesOn", { date: format(date, "EEEE, MMM d") })}</h2>
           {slots.map((s) => {
             const isFull = s.booking_count >= s.capacity;
+            const cost = getCreditCost(s.start_time, pricingPeriods);
             return (
               <Card key={s.id}>
                 <CardContent className="flex items-center justify-between p-4">
@@ -104,9 +138,10 @@ export default function TraineeBooking() {
                     <div className="mt-1 flex gap-2">
                       <Badge variant="secondary" className="capitalize">{s.class_type}</Badge>
                       <Badge variant={isFull ? "destructive" : "default"}>{t("trainee.booking.spots", { booked: s.booking_count, total: s.capacity })}</Badge>
+                      <Badge variant="outline">{t("trainee.booking.creditsCost", { cost })}</Badge>
                     </div>
                   </div>
-                  <Button onClick={() => bookSlot(s)} disabled={isFull || !activePkgId || isBooking}>
+                  <Button onClick={() => bookSlot(s)} disabled={isFull || !activePkgId || isBooking || remainingCredits < cost}>
                     {isFull ? t("trainee.booking.full") : recurring ? t("trainee.booking.bookWeekly") : t("trainee.booking.book")}
                   </Button>
                 </CardContent>

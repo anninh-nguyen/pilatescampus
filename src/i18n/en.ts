@@ -189,6 +189,7 @@ export default {
       full: "Full",
       bookWeekly: "Book Weekly",
       book: "Book",
+      creditsCost: "{{cost}} credit(s)",
       noActivePackage: "No active package",
       needPackage: "You need an active package to book.",
       classFull: "Class full",

@@ -189,6 +189,7 @@ export default {
       full: "Hết chỗ",
       bookWeekly: "Đặt hàng tuần",
       book: "Đặt",
+      creditsCost: "{{cost}} buổi",
       noActivePackage: "Không có gói tập",
       needPackage: "Bạn cần gói tập đang hoạt động để đặt.",
       classFull: "Lớp đã đầy",
