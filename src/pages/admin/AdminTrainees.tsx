@@ -46,6 +46,11 @@ export default function AdminTrainees() {
   const [editCredits, setEditCredits] = useState("");
   const [saving, setSaving] = useState(false);
 
+  // Invite dialog state
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmails, setInviteEmails] = useState("");
+  const [inviting, setInviting] = useState(false);
+
   const lc = useListControls<TraineeRow>(trainees, (tr, q) =>
     tr.full_name.toLowerCase().includes(q) || tr.email.toLowerCase().includes(q)
   );
