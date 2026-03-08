@@ -186,6 +186,16 @@ export default {
       title: "Session History",
       empty: "Past sessions will appear here once they are completed.",
     },
+    profile: {
+      title: "My Profile",
+      personalInfo: "Personal Information",
+      fullName: "Full Name",
+      phone: "Phone",
+      specialty: "Specialty",
+      bio: "Bio",
+      updateSuccess: "Profile updated successfully",
+      updateFailed: "Failed to update profile",
+    },
   },
   trainee: {
     package: {
