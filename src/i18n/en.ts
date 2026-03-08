@@ -93,6 +93,11 @@ export default {
       assignFailed: "Failed to assign package",
       assigning: "Assigning…",
       actions: "Actions",
+      editTrainee: "Edit Trainee",
+      credits: "Credits",
+      updateSuccess: "Trainee updated successfully",
+      updateFailed: "Failed to update trainee",
+      saving: "Saving…",
     },
     packages: {
       title: "Packages",

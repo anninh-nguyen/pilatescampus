@@ -7,9 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Package } from "lucide-react";
+import { Package, Pencil } from "lucide-react";
 import { addDays } from "date-fns";
 import { ListControls, useListControls } from "@/components/ListControls";
 
@@ -17,7 +19,7 @@ interface TraineeRow {
   user_id: string;
   full_name: string;
   email: string;
-  trainee_packages: { remaining_credits: number; is_active: boolean; packages: { name: string } | null }[];
+  trainee_packages: { id: string; remaining_credits: number; is_active: boolean; packages: { name: string } | null }[];
 }
 
 interface PackageOption {
@@ -36,6 +38,13 @@ export default function AdminTrainees() {
   const [selectedPackageId, setSelectedPackageId] = useState("");
   const [assigning, setAssigning] = useState(false);
 
+  // Edit dialog state
+  const [editOpen, setEditOpen] = useState(false);
+  const [editTrainee, setEditTrainee] = useState<TraineeRow | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editCredits, setEditCredits] = useState("");
+  const [saving, setSaving] = useState(false);
+
   const lc = useListControls<TraineeRow>(trainees, (tr, q) =>
     tr.full_name.toLowerCase().includes(q) || tr.email.toLowerCase().includes(q)
   );
@@ -49,7 +58,7 @@ export default function AdminTrainees() {
     const enriched: TraineeRow[] = [];
     for (const role of roles) {
       const profile = profileMap.get(role.user_id);
-      const { data: pkgs } = await supabase.from("trainee_packages").select("remaining_credits, is_active, packages(name)").eq("trainee_id", role.user_id);
+      const { data: pkgs } = await supabase.from("trainee_packages").select("id, remaining_credits, is_active, packages(name)").eq("trainee_id", role.user_id);
       enriched.push({ user_id: role.user_id, full_name: profile?.full_name || "", email: profile?.email || "", trainee_packages: (pkgs || []) as unknown as TraineeRow["trainee_packages"] });
     }
     setTrainees(enriched);
@@ -74,6 +83,34 @@ export default function AdminTrainees() {
     const { error } = await supabase.from("trainee_packages").insert({ trainee_id: selectedTrainee.user_id, package_id: selectedPackageId, remaining_credits: pkg.credit_count, expires_at: addDays(new Date(), pkg.expiry_days).toISOString() });
     setAssigning(false);
     if (error) { toast.error(t("admin.trainees.assignFailed")); } else { toast.success(t("admin.trainees.packageAssigned")); setDialogOpen(false); fetchTrainees(); }
+  };
+
+  const openEditDialog = (trainee: TraineeRow) => {
+    setEditTrainee(trainee);
+    setEditName(trainee.full_name);
+    const activePkg = trainee.trainee_packages.find((p) => p.is_active);
+    setEditCredits(activePkg ? String(activePkg.remaining_credits) : "");
+    setEditOpen(true);
+  };
+
+  const handleEdit = async () => {
+    if (!editTrainee) return;
+    setSaving(true);
+    // Update name
+    const { error: nameErr } = await supabase.from("profiles").update({ full_name: editName.trim() }).eq("user_id", editTrainee.user_id);
+    if (nameErr) { toast.error(t("admin.trainees.updateFailed")); setSaving(false); return; }
+
+    // Update credits on active package if value provided
+    const activePkg = editTrainee.trainee_packages.find((p) => p.is_active);
+    if (activePkg && editCredits !== "") {
+      const { error: creditErr } = await supabase.from("trainee_packages").update({ remaining_credits: parseInt(editCredits, 10) }).eq("id", activePkg.id);
+      if (creditErr) { toast.error(t("admin.trainees.updateFailed")); setSaving(false); return; }
+    }
+
+    setSaving(false);
+    toast.success(t("admin.trainees.updateSuccess"));
+    setEditOpen(false);
+    fetchTrainees();
   };
 
   return (
@@ -103,7 +140,10 @@ export default function AdminTrainees() {
                     <TableCell>{tr.email || "—"}</TableCell>
                     <TableCell>{activePkg?.packages?.name || <Badge variant="secondary">{t("admin.trainees.none")}</Badge>}</TableCell>
                     <TableCell>{activePkg ? activePkg.remaining_credits : "—"}</TableCell>
-                    <TableCell>
+                    <TableCell className="space-x-2">
+                      <Button variant="ghost" size="sm" onClick={() => openEditDialog(tr)}>
+                        <Pencil className="mr-1 h-4 w-4" />{t("common.edit")}
+                      </Button>
                       <Button variant="outline" size="sm" onClick={() => openAssignDialog(tr)}>
                         <Package className="mr-1 h-4 w-4" />{t("admin.trainees.assignPackage")}
                       </Button>
@@ -119,6 +159,7 @@ export default function AdminTrainees() {
         </CardContent>
       </Card>
 
+      {/* Assign Package Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader><DialogTitle>{t("admin.trainees.assignPackage")} — {selectedTrainee?.full_name}</DialogTitle></DialogHeader>
@@ -129,6 +170,29 @@ export default function AdminTrainees() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
             <Button onClick={handleAssign} disabled={!selectedPackageId || assigning}>{assigning ? t("admin.trainees.assigning") : t("admin.trainees.assignPackage")}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Trainee Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{t("admin.trainees.editTrainee")}</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>{t("admin.trainees.name")}</Label>
+              <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
+            </div>
+            {editTrainee?.trainee_packages.some((p) => p.is_active) && (
+              <div className="space-y-2">
+                <Label>{t("admin.trainees.credits")}</Label>
+                <Input type="number" min={0} value={editCredits} onChange={(e) => setEditCredits(e.target.value)} />
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleEdit} disabled={saving || !editName.trim()}>{saving ? t("admin.trainees.saving") : t("common.save")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
