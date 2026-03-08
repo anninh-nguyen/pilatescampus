@@ -69,6 +69,7 @@ export type Database = {
           created_at: string
           end_time: string
           id: string
+          parent_class_id: string | null
           recurrence_rule: string | null
           start_time: string
           title: string
@@ -81,6 +82,7 @@ export type Database = {
           created_at?: string
           end_time: string
           id?: string
+          parent_class_id?: string | null
           recurrence_rule?: string | null
           start_time: string
           title: string
@@ -93,6 +95,7 @@ export type Database = {
           created_at?: string
           end_time?: string
           id?: string
+          parent_class_id?: string | null
           recurrence_rule?: string | null
           start_time?: string
           title?: string
@@ -101,7 +104,67 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "class_slots_parent_class_id_fkey"
+            columns: ["parent_class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "class_slots_trainer_id_fkey"
+            columns: ["trainer_id"]
+            isOneToOne: false
+            referencedRelation: "trainers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classes: {
+        Row: {
+          capacity: number
+          class_type: string
+          created_at: string
+          end_date: string
+          end_time: string
+          id: string
+          recurrence_days: number[]
+          start_date: string
+          start_time: string
+          title: string
+          trainer_id: string
+          updated_at: string
+        }
+        Insert: {
+          capacity: number
+          class_type?: string
+          created_at?: string
+          end_date: string
+          end_time: string
+          id?: string
+          recurrence_days?: number[]
+          start_date: string
+          start_time: string
+          title: string
+          trainer_id: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number
+          class_type?: string
+          created_at?: string
+          end_date?: string
+          end_time?: string
+          id?: string
+          recurrence_days?: number[]
+          start_date?: string
+          start_time?: string
+          title?: string
+          trainer_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classes_trainer_id_fkey"
             columns: ["trainer_id"]
             isOneToOne: false
             referencedRelation: "trainers"
