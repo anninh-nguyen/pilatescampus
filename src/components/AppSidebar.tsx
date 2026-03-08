@@ -23,6 +23,7 @@ import {
   DollarSign,
   BarChart3,
   ShieldAlert,
+  Award,
   Calendar,
   History,
   Bell,
@@ -43,6 +44,7 @@ const adminLinks = [
   { labelKey: "nav.pricing", icon: DollarSign, path: "/admin/pricing" },
   { labelKey: "nav.reports", icon: BarChart3, path: "/admin/reports" },
   { labelKey: "nav.cancellation", icon: ShieldAlert, path: "/admin/cancellation" },
+  { labelKey: "nav.compensation", icon: Award, path: "/admin/compensation" },
   { labelKey: "nav.bookForTrainee", icon: UserPlus, path: "/admin/book-for-trainee" },
   { labelKey: "nav.manageBookings", icon: ClipboardList, path: "/admin/manage-bookings" },
 ];

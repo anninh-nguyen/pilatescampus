@@ -7,12 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2 } from "lucide-react";
 import { ListControls, useListControls } from "@/components/ListControls";
 
-interface TrainerRow { id: string; user_id: string; specialty: string | null; bio: string | null; full_name: string; email: string; }
+const TRAINER_LEVELS = ["trainee_trainer", "junior", "senior", "master"] as const;
+
+interface TrainerRow { id: string; user_id: string; specialty: string | null; bio: string | null; level: string; full_name: string; email: string; }
 
 export default function AdminTrainers() {
   const { t } = useTranslation();
@@ -28,15 +31,21 @@ export default function AdminTrainers() {
   );
 
   const fetchTrainers = async () => {
-    const { data: trainerData } = await supabase.from("trainers").select("id, user_id, specialty, bio").order("created_at", { ascending: false });
+    const { data: trainerData } = await supabase.from("trainers").select("id, user_id, specialty, bio, level").order("created_at", { ascending: false });
     if (!trainerData || trainerData.length === 0) { setTrainers([]); return; }
     const userIds = trainerData.map((t) => t.user_id);
     const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email").in("user_id", userIds);
     const profileMap = new Map((profiles || []).map((p) => [p.user_id, p]));
     setTrainers(trainerData.map((tr) => {
       const profile = profileMap.get(tr.user_id);
-      return { ...tr, full_name: profile?.full_name || "", email: profile?.email || "" };
+      return { ...tr, level: (tr as any).level || "trainee_trainer", full_name: profile?.full_name || "", email: profile?.email || "" };
     }));
+  };
+
+  const handleLevelChange = async (trainerId: string, newLevel: string) => {
+    const { error } = await supabase.from("trainers").update({ level: newLevel as any }).eq("id", trainerId);
+    if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); }
+    else { toast({ title: t("admin.trainers.levelUpdated") }); fetchTrainers(); }
   };
 
   useEffect(() => { fetchTrainers(); }, []);
@@ -86,6 +95,7 @@ export default function AdminTrainers() {
                 <TableHead>{t("admin.trainers.name")}</TableHead>
                 <TableHead>{t("admin.trainers.email")}</TableHead>
                 <TableHead>{t("admin.trainers.specialty")}</TableHead>
+                <TableHead>{t("admin.trainers.level")}</TableHead>
                 <TableHead className="w-[60px]" />
               </TableRow>
             </TableHeader>
@@ -95,11 +105,21 @@ export default function AdminTrainers() {
                   <TableCell>{tr.full_name || "—"}</TableCell>
                   <TableCell>{tr.email || "—"}</TableCell>
                   <TableCell>{tr.specialty || "—"}</TableCell>
+                  <TableCell>
+                    <Select value={tr.level} onValueChange={(v) => handleLevelChange(tr.id, v)}>
+                      <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {TRAINER_LEVELS.map((lvl) => (
+                          <SelectItem key={lvl} value={lvl}>{t(`admin.compensation.levels.${lvl}`)}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
                   <TableCell><Button variant="ghost" size="icon" onClick={() => handleDelete(tr)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                 </TableRow>
               ))}
               {lc.paginated.length === 0 && (
-                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">{t("admin.trainers.noTrainers")}</TableCell></TableRow>
+                <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">{t("admin.trainers.noTrainers")}</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
