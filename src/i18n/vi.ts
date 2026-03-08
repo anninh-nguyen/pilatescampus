@@ -81,6 +81,7 @@ export default {
     bookForTrainee: "Đặt cho học viên",
     manageBookings: "Quản lý đặt chỗ",
     promotions: "Khuyến mãi",
+    emailSettings: "Cài đặt Email",
   },
   bookOnBehalf: {
     title: "Đặt lịch thay học viên",
