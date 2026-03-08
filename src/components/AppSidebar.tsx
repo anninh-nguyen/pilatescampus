@@ -23,6 +23,7 @@ import {
   DollarSign,
   BarChart3,
   ShieldAlert,
+  Award,
   Calendar,
   History,
   Bell,

@@ -58,6 +58,7 @@ export default {
     myBookings: "My Bookings",
     myProfile: "My Profile",
     cancellation: "Cancellation Policy",
+    compensation: "Compensation",
     bookForTrainee: "Book for Trainee",
     manageBookings: "Manage Bookings",
   },

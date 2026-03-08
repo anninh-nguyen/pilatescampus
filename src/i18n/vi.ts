@@ -58,6 +58,7 @@ export default {
     myBookings: "Lịch đã đặt",
     myProfile: "Hồ sơ của tôi",
     cancellation: "Chính sách hủy",
+    compensation: "Thù lao HLV",
     bookForTrainee: "Đặt cho học viên",
     manageBookings: "Quản lý đặt chỗ",
   },
