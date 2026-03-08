@@ -58,6 +58,15 @@ export default {
     myBookings: "Lịch đã đặt",
     myProfile: "Hồ sơ của tôi",
     cancellation: "Chính sách hủy",
+    bookForTrainee: "Đặt cho học viên",
+  },
+  bookOnBehalf: {
+    title: "Đặt lịch thay học viên",
+    selectTrainee: "Chọn học viên",
+    chooseTrainee: "Chọn học viên…",
+    selectTraineeFirst: "Vui lòng chọn học viên trước",
+    noPackage: "chưa có gói",
+    bookedSuccess: "Đã đặt buổi tập cho {{name}}",
   },
   admin: {
     dashboard: {
