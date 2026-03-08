@@ -379,6 +379,14 @@ export default {
       creditRefunded: "Đã hoàn lại buổi tập.",
       noBookings: "Chưa có lịch đặt",
     },
+    profile: {
+      title: "Hồ sơ của tôi",
+      personalInfo: "Thông tin cá nhân",
+      fullName: "Họ và tên",
+      phone: "Số điện thoại",
+      updateSuccess: "Cập nhật hồ sơ thành công",
+      updateFailed: "Cập nhật hồ sơ thất bại",
+    },
     promotions: {
       redeemVoucher: "Đổi voucher",
       voucherDescription: "Nhập mã voucher để nhận buổi tập thưởng.",

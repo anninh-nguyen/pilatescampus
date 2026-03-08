@@ -379,6 +379,14 @@ export default {
       creditRefunded: "Credit has been refunded.",
       noBookings: "No bookings yet",
     },
+    profile: {
+      title: "My Profile",
+      personalInfo: "Personal Information",
+      fullName: "Full Name",
+      phone: "Phone",
+      updateSuccess: "Profile updated successfully",
+      updateFailed: "Failed to update profile",
+    },
     promotions: {
       redeemVoucher: "Redeem Voucher",
       voucherDescription: "Enter a voucher code to receive bonus credits.",

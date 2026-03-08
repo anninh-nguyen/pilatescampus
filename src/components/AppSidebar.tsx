@@ -64,6 +64,7 @@ const traineeLinks = [
   { labelKey: "nav.myPackage", icon: CreditCard, path: "/trainee" },
   { labelKey: "nav.bookSessions", icon: BookOpen, path: "/trainee/book" },
   { labelKey: "nav.myBookings", icon: CalendarDays, path: "/trainee/bookings" },
+  { labelKey: "nav.myProfile", icon: User, path: "/trainee/profile" },
   { labelKey: "nav.notifications", icon: Bell, path: "/trainee/notifications" },
 ];
 
