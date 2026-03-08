@@ -173,6 +173,19 @@ export default {
       periodDeleted: "Đã xóa khung giờ",
       noPeriods: "Chưa cấu hình khung giờ",
     },
+    cancellation: {
+      title: "Chính sách hủy",
+      description: "Cấu hình các mức hoàn trả khi hủy. Mức có số giờ cao nhất mà học viên đáp ứng sẽ được áp dụng.",
+      addTier: "Thêm mức",
+      editTier: "Sửa mức",
+      hoursBefore: "Số giờ trước buổi tập",
+      refundPercentage: "% Hoàn trả",
+      tierCreated: "Đã tạo mức hủy",
+      tierUpdated: "Đã cập nhật mức hủy",
+      tierDeleted: "Đã xóa mức hủy",
+      noTiers: "Chưa cấu hình mức hủy",
+      lessThanMin: "Ít hơn mức tối thiểu",
+    },
   },
   trainer: {
     schedule: {
