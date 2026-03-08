@@ -1,0 +1,1 @@
+CREATE POLICY "Trainers can update own record" ON public.trainers FOR UPDATE TO authenticated USING (user_id = auth.uid());
