@@ -59,7 +59,25 @@ export default function BookOnBehalf() {
       // Get all trainee role users
       const { data: roles } = await supabase.from("user_roles").select("user_id").eq("role", "trainee");
       if (!roles) return;
-      const traineeUserIds = new Set(roles.map((r) => r.user_id));
+      let traineeUserIds = new Set(roles.map((r) => r.user_id));
+
+      // For trainers: only show trainees who have booked at least one of this trainer's classes
+      if (role === "trainer" && user) {
+        const { data: trainer } = await supabase.from("trainers").select("id").eq("user_id", user.id).single();
+        if (!trainer) { setTrainees([]); return; }
+
+        // Get all class slot IDs for this trainer
+        const { data: trainerSlots } = await supabase.from("class_slots").select("id").eq("trainer_id", trainer.id);
+        if (!trainerSlots || trainerSlots.length === 0) { setTrainees([]); return; }
+
+        const slotIds = trainerSlots.map((s) => s.id);
+        // Get distinct trainee IDs who have bookings in those slots
+        const { data: bookings } = await supabase.from("bookings").select("trainee_id").in("class_slot_id", slotIds);
+        const bookedTraineeIds = new Set((bookings || []).map((b) => b.trainee_id));
+
+        // Intersect: must be both a trainee role AND have booked with this trainer
+        traineeUserIds = new Set([...traineeUserIds].filter((id) => bookedTraineeIds.has(id)));
+      }
 
       // Get active packages
       const { data: pkgs } = await supabase.from("trainee_packages").select("id, trainee_id, remaining_credits").eq("is_active", true);
@@ -89,7 +107,7 @@ export default function BookOnBehalf() {
       setTrainees(opts);
     };
     fetchTrainees();
-  }, []);
+  }, [user, role]);
 
   // Load slots for selected date (filtered for trainer's classes if trainer role)
   useEffect(() => {
