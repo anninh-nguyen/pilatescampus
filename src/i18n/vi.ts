@@ -57,6 +57,7 @@ export default {
     bookSessions: "Đặt buổi tập",
     myBookings: "Lịch đã đặt",
     myProfile: "Hồ sơ của tôi",
+    cancellation: "Chính sách hủy",
   },
   admin: {
     dashboard: {
