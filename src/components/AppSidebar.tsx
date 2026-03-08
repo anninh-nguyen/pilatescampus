@@ -29,6 +29,7 @@ import {
   CreditCard,
   BookOpen,
   UserPlus,
+  ClipboardList,
   LogOut,
   User,
 } from "lucide-react";
@@ -43,6 +44,7 @@ const adminLinks = [
   { labelKey: "nav.reports", icon: BarChart3, path: "/admin/reports" },
   { labelKey: "nav.cancellation", icon: ShieldAlert, path: "/admin/cancellation" },
   { labelKey: "nav.bookForTrainee", icon: UserPlus, path: "/admin/book-for-trainee" },
+  { labelKey: "nav.manageBookings", icon: ClipboardList, path: "/admin/manage-bookings" },
 ];
 
 const trainerLinks = [
@@ -51,6 +53,7 @@ const trainerLinks = [
   { labelKey: "nav.myProfile", icon: User, path: "/trainer/profile" },
   { labelKey: "nav.notifications", icon: Bell, path: "/trainer/notifications" },
   { labelKey: "nav.bookForTrainee", icon: UserPlus, path: "/trainer/book-for-trainee" },
+  { labelKey: "nav.manageBookings", icon: ClipboardList, path: "/trainer/manage-bookings" },
 ];
 
 const traineeLinks = [
