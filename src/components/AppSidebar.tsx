@@ -20,6 +20,7 @@ import {
   UserCheck,
   Package,
   CalendarDays,
+  DollarSign,
   BarChart3,
   Calendar,
   History,
