@@ -59,6 +59,7 @@ export default {
     myProfile: "My Profile",
     cancellation: "Cancellation Policy",
     bookForTrainee: "Book for Trainee",
+    manageBookings: "Manage Bookings",
   },
   bookOnBehalf: {
     title: "Book on Behalf of Trainee",
@@ -67,6 +68,17 @@ export default {
     selectTraineeFirst: "Please select a trainee first",
     noPackage: "no package",
     bookedSuccess: "Session booked for {{name}}",
+  },
+  manageBookings: {
+    title: "Manage Bookings",
+    trainee: "Trainee",
+    class: "Class",
+    dateTime: "Date & Time",
+    type: "Type",
+    status: "Status",
+    noBookings: "No confirmed bookings",
+    cancelledFor: "Booking cancelled for {{name}}",
+    noRefundApplied: "No refund applied (too close to session).",
   },
   admin: {
     dashboard: {
