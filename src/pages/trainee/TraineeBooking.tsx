@@ -132,6 +132,7 @@ export default function TraineeBooking() {
           <Card><CardContent className="p-3"><Calendar mode="single" selected={date} onSelect={(d) => d && setDate(d)} className="pointer-events-auto" /></CardContent></Card>
           <Card><CardContent className="flex items-center gap-3 p-4"><Switch checked={recurring} onCheckedChange={setRecurring} id="recurring" /><Label htmlFor="recurring">{t("trainee.booking.bookRecurring")}</Label></CardContent></Card>
           {activePkgId && (<Card><CardContent className="p-4"><p className="text-sm text-muted-foreground">{t("trainee.booking.creditsRemaining")}</p><p className="text-2xl font-bold">{remainingCredits}</p></CardContent></Card>)}
+          <CancellationPolicyInfo />
         </div>
         <div className="space-y-3">
           <h2 className="font-serif text-xl font-semibold">{t("trainee.booking.classesOn", { date: format(date, "EEEE, MMM d") })}</h2>

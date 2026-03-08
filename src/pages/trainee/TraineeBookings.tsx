@@ -98,6 +98,9 @@ export default function TraineeBookings() {
     <DashboardLayout>
       <h1 className="mb-6 font-serif text-3xl font-bold">{t("trainee.bookings.title")}</h1>
       <div className="mb-4">
+        <CancellationPolicyInfo />
+      </div>
+      <div className="mb-4">
         <ListControls search={lc.search} onSearchChange={lc.setSearch} page={lc.page} totalPages={lc.totalPages} onPageChange={lc.setPage} pageSize={lc.pageSize} onPageSizeChange={lc.setPageSize} totalItems={lc.totalItems} filterElement={statusFilterElement} />
       </div>
       <Card>
