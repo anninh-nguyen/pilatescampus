@@ -33,6 +33,7 @@ import {
   ClipboardList,
   LogOut,
   User,
+  Gift,
 } from "lucide-react";
 
 const adminLinks = [
