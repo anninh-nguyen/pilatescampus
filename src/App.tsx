@@ -26,6 +26,7 @@ import TrainerProfile from "./pages/trainer/TrainerProfile";
 import TraineePackage from "./pages/trainee/TraineePackage";
 import TraineeBooking from "./pages/trainee/TraineeBooking";
 import TraineeBookings from "./pages/trainee/TraineeBookings";
+import TraineeProfile from "./pages/trainee/TraineeProfile";
 import Notifications from "./pages/shared/Notifications";
 import BookOnBehalf from "./pages/shared/BookOnBehalf";
 import ManageBookings from "./pages/shared/ManageBookings";
@@ -72,6 +73,7 @@ const App = () => (
             <Route path="/trainee" element={<ProtectedRoute allowedRoles={["trainee"]}><TraineePackage /></ProtectedRoute>} />
             <Route path="/trainee/book" element={<ProtectedRoute allowedRoles={["trainee"]}><TraineeBooking /></ProtectedRoute>} />
             <Route path="/trainee/bookings" element={<ProtectedRoute allowedRoles={["trainee"]}><TraineeBookings /></ProtectedRoute>} />
+            <Route path="/trainee/profile" element={<ProtectedRoute allowedRoles={["trainee"]}><TraineeProfile /></ProtectedRoute>} />
             <Route path="/trainee/notifications" element={<ProtectedRoute allowedRoles={["trainee"]}><Notifications /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
