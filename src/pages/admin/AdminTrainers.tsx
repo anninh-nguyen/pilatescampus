@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { DashboardLayout } from "@/components/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +16,8 @@ interface TrainerRow {
   user_id: string;
   specialty: string | null;
   bio: string | null;
-  profiles: { full_name: string; email: string } | null;
+  full_name: string;
+  email: string;
 }
 
 export default function AdminTrainers() {
@@ -29,11 +30,23 @@ export default function AdminTrainers() {
   const { toast } = useToast();
 
   const fetchTrainers = async () => {
-    const { data } = await supabase
+    const { data: trainerData } = await supabase
       .from("trainers")
-      .select("id, user_id, specialty, bio, profiles!trainers_user_id_fkey(full_name, email)")
+      .select("id, user_id, specialty, bio")
       .order("created_at", { ascending: false });
-    if (data) setTrainers(data as unknown as TrainerRow[]);
+    if (!trainerData || trainerData.length === 0) { setTrainers([]); return; }
+
+    const userIds = trainerData.map((t) => t.user_id);
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("user_id, full_name, email")
+      .in("user_id", userIds);
+
+    const profileMap = new Map((profiles || []).map((p) => [p.user_id, p]));
+    setTrainers(trainerData.map((tr) => {
+      const profile = profileMap.get(tr.user_id);
+      return { ...tr, full_name: profile?.full_name || "", email: profile?.email || "" };
+    }));
   };
 
   useEffect(() => { fetchTrainers(); }, []);
@@ -109,8 +122,8 @@ export default function AdminTrainers() {
             <TableBody>
               {trainers.map((tr) => (
                 <TableRow key={tr.id}>
-                  <TableCell>{tr.profiles?.full_name || "—"}</TableCell>
-                  <TableCell>{tr.profiles?.email || "—"}</TableCell>
+                  <TableCell>{tr.full_name || "—"}</TableCell>
+                  <TableCell>{tr.email || "—"}</TableCell>
                   <TableCell>{tr.specialty || "—"}</TableCell>
                   <TableCell>
                     <Button variant="ghost" size="icon" onClick={() => handleDelete(tr)}>

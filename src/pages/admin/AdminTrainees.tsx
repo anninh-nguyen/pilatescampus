@@ -14,7 +14,8 @@ import { addDays } from "date-fns";
 
 interface TraineeRow {
   user_id: string;
-  profiles: { full_name: string; email: string } | null;
+  full_name: string;
+  email: string;
   trainee_packages: { remaining_credits: number; is_active: boolean; packages: { name: string } | null }[];
 }
 
@@ -35,20 +36,34 @@ export default function AdminTrainees() {
   const [assigning, setAssigning] = useState(false);
 
   const fetchTrainees = async () => {
-    const { data } = await supabase
+    // Get trainee user_ids
+    const { data: roles } = await supabase
       .from("user_roles")
-      .select("user_id, profiles!user_roles_user_id_fkey(full_name, email)")
+      .select("user_id")
       .eq("role", "trainee");
-    if (!data) return;
+    if (!roles || roles.length === 0) { setTrainees([]); return; }
+
+    const userIds = roles.map((r) => r.user_id);
+
+    // Fetch profiles for these users
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("user_id, full_name, email")
+      .in("user_id", userIds);
+
+    const profileMap = new Map((profiles || []).map((p) => [p.user_id, p]));
+
     const enriched: TraineeRow[] = [];
-    for (const row of data) {
+    for (const role of roles) {
+      const profile = profileMap.get(role.user_id);
       const { data: pkgs } = await supabase
         .from("trainee_packages")
         .select("remaining_credits, is_active, packages(name)")
-        .eq("trainee_id", row.user_id);
+        .eq("trainee_id", role.user_id);
       enriched.push({
-        user_id: row.user_id,
-        profiles: row.profiles as unknown as { full_name: string; email: string },
+        user_id: role.user_id,
+        full_name: profile?.full_name || "",
+        email: profile?.email || "",
         trainee_packages: (pkgs || []) as unknown as TraineeRow["trainee_packages"],
       });
     }
@@ -116,8 +131,8 @@ export default function AdminTrainees() {
                 const activePkg = tr.trainee_packages.find((p) => p.is_active);
                 return (
                   <TableRow key={tr.user_id}>
-                    <TableCell>{tr.profiles?.full_name || "—"}</TableCell>
-                    <TableCell>{tr.profiles?.email || "—"}</TableCell>
+                    <TableCell>{tr.full_name || "—"}</TableCell>
+                    <TableCell>{tr.email || "—"}</TableCell>
                     <TableCell>
                       {activePkg?.packages?.name || (
                         <Badge variant="secondary">{t("admin.trainees.none")}</Badge>
@@ -149,7 +164,7 @@ export default function AdminTrainees() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {t("admin.trainees.assignPackage")} — {selectedTrainee?.profiles?.full_name}
+              {t("admin.trainees.assignPackage")} — {selectedTrainee?.full_name}
             </DialogTitle>
           </DialogHeader>
           <Select value={selectedPackageId} onValueChange={setSelectedPackageId}>
