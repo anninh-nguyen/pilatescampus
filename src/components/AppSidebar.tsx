@@ -29,6 +29,7 @@ import {
   CreditCard,
   BookOpen,
   UserPlus,
+  ClipboardList,
   LogOut,
   User,
 } from "lucide-react";
