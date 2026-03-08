@@ -44,6 +44,7 @@ const adminLinks = [
   { labelKey: "nav.reports", icon: BarChart3, path: "/admin/reports" },
   { labelKey: "nav.cancellation", icon: ShieldAlert, path: "/admin/cancellation" },
   { labelKey: "nav.bookForTrainee", icon: UserPlus, path: "/admin/book-for-trainee" },
+  { labelKey: "nav.manageBookings", icon: ClipboardList, path: "/admin/manage-bookings" },
 ];
 
 const trainerLinks = [
