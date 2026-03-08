@@ -4,14 +4,17 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import { ListControls, useListControls } from "@/components/ListControls";
 
+interface TraineeProfile { full_name: string; email?: string; phone?: string | null }
+
 interface SessionRow {
   id: string; start_time: string; end_time: string; title: string; class_type: string;
-  bookings: { trainee_id: string; status: string; profiles: { full_name: string } | null }[];
+  bookings: { trainee_id: string; status: string; profiles: TraineeProfile | null }[];
 }
 
 export default function TrainerSchedule() {
@@ -38,17 +41,17 @@ export default function TrainerSchedule() {
 
       // Get trainee names separately
       const traineeIds = [...new Set(data.flatMap((s: any) => (s.bookings || []).map((b: any) => b.trainee_id)).filter(Boolean))];
-      let nameMap = new Map<string, string>();
+      let profileMap = new Map<string, TraineeProfile>();
       if (traineeIds.length > 0) {
-        const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", traineeIds);
-        if (profiles) profiles.forEach((p) => nameMap.set(p.user_id, p.full_name));
+        const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email, phone").in("user_id", traineeIds);
+        if (profiles) profiles.forEach((p) => profileMap.set(p.user_id, { full_name: p.full_name, email: p.email, phone: p.phone }));
       }
 
       const enriched = data.map((s: any) => ({
         ...s,
         bookings: (s.bookings || []).map((b: any) => ({
           ...b,
-          profiles: { full_name: nameMap.get(b.trainee_id) || "Trainee" },
+          profiles: profileMap.get(b.trainee_id) || { full_name: "Trainee" },
         })),
       }));
       setSessions(enriched as unknown as SessionRow[]);
@@ -81,7 +84,16 @@ export default function TrainerSchedule() {
                   <TableCell className="capitalize">{s.class_type}</TableCell>
                   <TableCell>
                     {s.bookings.filter((b) => b.status === "confirmed").map((b) => (
-                      <Badge key={b.trainee_id} variant="secondary" className="mr-1">{(b as any).profiles?.full_name || "Trainee"}</Badge>
+                      <HoverCard key={b.trainee_id}>
+                        <HoverCardTrigger asChild>
+                          <Badge variant="secondary" className="mr-1 cursor-pointer">{b.profiles?.full_name || "Trainee"}</Badge>
+                        </HoverCardTrigger>
+                        <HoverCardContent className="w-56 text-sm">
+                          <p className="font-semibold">{b.profiles?.full_name}</p>
+                          {b.profiles?.email && <p className="text-muted-foreground">{b.profiles.email}</p>}
+                          {b.profiles?.phone && <p className="text-muted-foreground">{b.profiles.phone}</p>}
+                        </HoverCardContent>
+                      </HoverCard>
                     ))}
                     {s.bookings.filter((b) => b.status === "confirmed").length === 0 && <span className="text-muted-foreground">{t("trainer.schedule.noBookings")}</span>}
                   </TableCell>
