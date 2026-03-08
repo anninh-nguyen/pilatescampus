@@ -211,6 +211,39 @@ export type Database = {
         }
         Relationships: []
       }
+      time_pricing: {
+        Row: {
+          created_at: string
+          credit_cost: number
+          end_time: string
+          id: string
+          label: string
+          start_time: string
+          tier: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          credit_cost?: number
+          end_time: string
+          id?: string
+          label: string
+          start_time: string
+          tier?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          credit_cost?: number
+          end_time?: string
+          id?: string
+          label?: string
+          start_time?: string
+          tier?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       trainee_packages: {
         Row: {
           created_at: string
