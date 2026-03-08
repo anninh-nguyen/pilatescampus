@@ -28,6 +28,7 @@ import {
   CreditCard,
   BookOpen,
   LogOut,
+  User,
 } from "lucide-react";
 
 const adminLinks = [
@@ -43,6 +44,7 @@ const adminLinks = [
 const trainerLinks = [
   { labelKey: "nav.mySchedule", icon: Calendar, path: "/trainer" },
   { labelKey: "nav.sessionHistory", icon: History, path: "/trainer/history" },
+  { labelKey: "nav.myProfile", icon: User, path: "/trainer/profile" },
   { labelKey: "nav.notifications", icon: Bell, path: "/trainer/notifications" },
 ];
 

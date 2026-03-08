@@ -17,6 +17,7 @@ import AdminPricing from "./pages/admin/AdminPricing";
 import AdminReports from "./pages/admin/AdminReports";
 import TrainerSchedule from "./pages/trainer/TrainerSchedule";
 import TrainerHistory from "./pages/trainer/TrainerHistory";
+import TrainerProfile from "./pages/trainer/TrainerProfile";
 import TraineePackage from "./pages/trainee/TraineePackage";
 import TraineeBooking from "./pages/trainee/TraineeBooking";
 import TraineeBookings from "./pages/trainee/TraineeBookings";
@@ -48,6 +49,7 @@ const App = () => (
             {/* Trainer routes */}
             <Route path="/trainer" element={<ProtectedRoute allowedRoles={["trainer"]}><TrainerSchedule /></ProtectedRoute>} />
             <Route path="/trainer/history" element={<ProtectedRoute allowedRoles={["trainer"]}><TrainerHistory /></ProtectedRoute>} />
+            <Route path="/trainer/profile" element={<ProtectedRoute allowedRoles={["trainer"]}><TrainerProfile /></ProtectedRoute>} />
             <Route path="/trainer/notifications" element={<ProtectedRoute allowedRoles={["trainer"]}><Notifications /></ProtectedRoute>} />
 
             {/* Trainee routes */}
