@@ -25,18 +25,35 @@ export default function TrainerSchedule() {
 
   useEffect(() => {
     if (!user) return;
-    const fetch = async () => {
+    const fetchSchedule = async () => {
       const { data: trainer } = await supabase.from("trainers").select("id").eq("user_id", user.id).single();
       if (!trainer) return;
       const { data } = await supabase
         .from("class_slots")
-        .select("id, title, start_time, end_time, class_type, bookings(trainee_id, status, profiles:profiles!bookings_trainee_id_fkey(full_name))")
+        .select("id, title, start_time, end_time, class_type, bookings(trainee_id, status)")
         .eq("trainer_id", trainer.id)
         .gte("start_time", new Date().toISOString())
         .order("start_time", { ascending: true });
-      if (data) setSessions(data as unknown as SessionRow[]);
+      if (!data) return;
+
+      // Get trainee names separately
+      const traineeIds = [...new Set(data.flatMap((s: any) => (s.bookings || []).map((b: any) => b.trainee_id)).filter(Boolean))];
+      let nameMap = new Map<string, string>();
+      if (traineeIds.length > 0) {
+        const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", traineeIds);
+        if (profiles) profiles.forEach((p) => nameMap.set(p.user_id, p.full_name));
+      }
+
+      const enriched = data.map((s: any) => ({
+        ...s,
+        bookings: (s.bookings || []).map((b: any) => ({
+          ...b,
+          profiles: { full_name: nameMap.get(b.trainee_id) || "Trainee" },
+        })),
+      }));
+      setSessions(enriched as unknown as SessionRow[]);
     };
-    fetch();
+    fetchSchedule();
   }, [user]);
 
   return (
