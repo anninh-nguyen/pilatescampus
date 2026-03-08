@@ -97,8 +97,8 @@ export default function TraineePackage() {
   }
 
   const total = pkg.packages?.credit_count || 1;
-  const used = total - pkg.remaining_credits;
-  const pct = Math.round((pkg.remaining_credits / total) * 100);
+  const used = Math.max(0, total - pkg.remaining_credits);
+  const pct = Math.min(100, Math.round((pkg.remaining_credits / total) * 100));
 
   return (
     <DashboardLayout>
