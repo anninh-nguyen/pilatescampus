@@ -14,6 +14,9 @@ export default {
     noData: "Không có dữ liệu",
     loading: "Đang tải…",
     error: "Lỗi",
+    search: "Tìm kiếm…",
+    showing: "{{from}}–{{to}} trên {{total}}",
+    all: "Tất cả",
   },
   roles: {
     admin: "Quản trị viên",

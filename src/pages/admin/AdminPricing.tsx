@@ -12,15 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Pencil, Clock } from "lucide-react";
+import { ListControls, useListControls } from "@/components/ListControls";
 
-interface TimePricing {
-  id: string;
-  label: string;
-  tier: string;
-  start_time: string;
-  end_time: string;
-  credit_cost: number;
-}
+interface TimePricing { id: string; label: string; tier: string; start_time: string; end_time: string; credit_cost: number; }
 
 const TIER_OPTIONS = ["peak", "shoulder", "off_peak"] as const;
 
@@ -38,6 +32,10 @@ export default function AdminPricing() {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({ label: "", tier: "off_peak", startTime: "06:00", endTime: "09:00", creditCost: 1 });
 
+  const lc = useListControls<TimePricing>(periods, (p, q) =>
+    p.label.toLowerCase().includes(q) || p.tier.toLowerCase().includes(q)
+  );
+
   const fetchPeriods = async () => {
     const { data } = await supabase.from("time_pricing").select("*").order("start_time", { ascending: true });
     if (data) setPeriods(data as unknown as TimePricing[]);
@@ -45,26 +43,11 @@ export default function AdminPricing() {
 
   useEffect(() => { fetchPeriods(); }, []);
 
-  const resetForm = () => {
-    setForm({ label: "", tier: "off_peak", startTime: "06:00", endTime: "09:00", creditCost: 1 });
-    setEditId(null);
-  };
-
-  const openEdit = (p: TimePricing) => {
-    setForm({ label: p.label, tier: p.tier, startTime: p.start_time.slice(0, 5), endTime: p.end_time.slice(0, 5), creditCost: p.credit_cost });
-    setEditId(p.id);
-    setOpen(true);
-  };
+  const resetForm = () => { setForm({ label: "", tier: "off_peak", startTime: "06:00", endTime: "09:00", creditCost: 1 }); setEditId(null); };
+  const openEdit = (p: TimePricing) => { setForm({ label: p.label, tier: p.tier, startTime: p.start_time.slice(0, 5), endTime: p.end_time.slice(0, 5), creditCost: p.credit_cost }); setEditId(p.id); setOpen(true); };
 
   const handleSave = async () => {
-    const payload = {
-      label: form.label,
-      tier: form.tier,
-      start_time: form.startTime,
-      end_time: form.endTime,
-      credit_cost: form.creditCost,
-    };
-
+    const payload = { label: form.label, tier: form.tier, start_time: form.startTime, end_time: form.endTime, credit_cost: form.creditCost };
     if (editId) {
       const { error } = await supabase.from("time_pricing").update(payload).eq("id", editId);
       if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); return; }
@@ -74,15 +57,12 @@ export default function AdminPricing() {
       if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); return; }
       toast({ title: t("admin.pricing.periodCreated") });
     }
-    setOpen(false);
-    resetForm();
-    fetchPeriods();
+    setOpen(false); resetForm(); fetchPeriods();
   };
 
   const handleDelete = async (id: string) => {
     await supabase.from("time_pricing").delete().eq("id", id);
-    toast({ title: t("admin.pricing.periodDeleted") });
-    fetchPeriods();
+    toast({ title: t("admin.pricing.periodDeleted") }); fetchPeriods();
   };
 
   return (
@@ -90,60 +70,34 @@ export default function AdminPricing() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-serif text-3xl font-bold">{t("admin.pricing.title")}</h1>
         <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetForm(); }}>
-          <DialogTrigger asChild>
-            <Button><Plus className="mr-2 h-4 w-4" />{t("admin.pricing.addPeriod")}</Button>
-          </DialogTrigger>
+          <DialogTrigger asChild><Button><Plus className="mr-2 h-4 w-4" />{t("admin.pricing.addPeriod")}</Button></DialogTrigger>
           <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>{editId ? t("admin.pricing.editPeriod") : t("admin.pricing.addPeriod")}</DialogTitle>
-            </DialogHeader>
+            <DialogHeader><DialogTitle>{editId ? t("admin.pricing.editPeriod") : t("admin.pricing.addPeriod")}</DialogTitle></DialogHeader>
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>{t("admin.pricing.label")}</Label>
-                <Input value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="e.g. Morning Peak" />
-              </div>
+              <div className="space-y-2"><Label>{t("admin.pricing.label")}</Label><Input value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="e.g. Morning Peak" /></div>
               <div className="space-y-2">
                 <Label>{t("admin.pricing.tier")}</Label>
                 <Select value={form.tier} onValueChange={(v) => setForm({ ...form, tier: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {TIER_OPTIONS.map((tier) => (
-                      <SelectItem key={tier} value={tier}>{t(`admin.pricing.${tier}`)}</SelectItem>
-                    ))}
-                  </SelectContent>
+                  <SelectContent>{TIER_OPTIONS.map((tier) => <SelectItem key={tier} value={tier}>{t(`admin.pricing.${tier}`)}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>{t("admin.pricing.startTime")}</Label>
-                  <Input type="time" value={form.startTime} onChange={(e) => setForm({ ...form, startTime: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>{t("admin.pricing.endTime")}</Label>
-                  <Input type="time" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} />
-                </div>
+                <div className="space-y-2"><Label>{t("admin.pricing.startTime")}</Label><Input type="time" value={form.startTime} onChange={(e) => setForm({ ...form, startTime: e.target.value })} /></div>
+                <div className="space-y-2"><Label>{t("admin.pricing.endTime")}</Label><Input type="time" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} /></div>
               </div>
-              <div className="space-y-2">
-                <Label>{t("admin.pricing.creditCost")}</Label>
-                <Input type="number" min={1} value={form.creditCost} onChange={(e) => setForm({ ...form, creditCost: +e.target.value })} />
-              </div>
+              <div className="space-y-2"><Label>{t("admin.pricing.creditCost")}</Label><Input type="number" min={1} value={form.creditCost} onChange={(e) => setForm({ ...form, creditCost: +e.target.value })} /></div>
             </div>
-            <DialogFooter>
-              <Button onClick={handleSave}>{editId ? t("common.update") : t("common.create")}</Button>
-            </DialogFooter>
+            <DialogFooter><Button onClick={handleSave}>{editId ? t("common.update") : t("common.create")}</Button></DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
-
       <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Clock className="h-4 w-4" />
-            {t("admin.pricing.description")}
-          </CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle className="flex items-center gap-2 text-base"><Clock className="h-4 w-4" />{t("admin.pricing.description")}</CardTitle></CardHeader>
       </Card>
-
+      <div className="mb-4">
+        <ListControls search={lc.search} onSearchChange={lc.setSearch} page={lc.page} totalPages={lc.totalPages} onPageChange={lc.setPage} pageSize={lc.pageSize} onPageSizeChange={lc.setPageSize} totalItems={lc.totalItems} />
+      </div>
       <Card>
         <CardContent className="p-0">
           <Table>
@@ -157,14 +111,10 @@ export default function AdminPricing() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {periods.map((p) => (
+              {lc.paginated.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell className="font-medium">{p.label}</TableCell>
-                  <TableCell>
-                    <Badge variant={tierBadgeVariant(p.tier)}>
-                      {t(`admin.pricing.${p.tier}`)}
-                    </Badge>
-                  </TableCell>
+                  <TableCell><Badge variant={tierBadgeVariant(p.tier)}>{t(`admin.pricing.${p.tier}`)}</Badge></TableCell>
                   <TableCell>{p.start_time.slice(0, 5)} – {p.end_time.slice(0, 5)}</TableCell>
                   <TableCell className="font-bold">{p.credit_cost} {p.credit_cost === 1 ? t("admin.pricing.credit") : t("admin.pricing.credits")}</TableCell>
                   <TableCell>
@@ -175,7 +125,7 @@ export default function AdminPricing() {
                   </TableCell>
                 </TableRow>
               ))}
-              {periods.length === 0 && (
+              {lc.paginated.length === 0 && (
                 <TableRow><TableCell colSpan={5} className="py-8 text-center text-muted-foreground">{t("admin.pricing.noPeriods")}</TableCell></TableRow>
               )}
             </TableBody>

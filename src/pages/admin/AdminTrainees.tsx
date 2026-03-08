@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Package } from "lucide-react";
 import { addDays } from "date-fns";
+import { ListControls, useListControls } from "@/components/ListControls";
 
 interface TraineeRow {
   user_id: string;
@@ -35,85 +36,52 @@ export default function AdminTrainees() {
   const [selectedPackageId, setSelectedPackageId] = useState("");
   const [assigning, setAssigning] = useState(false);
 
+  const lc = useListControls<TraineeRow>(trainees, (tr, q) =>
+    tr.full_name.toLowerCase().includes(q) || tr.email.toLowerCase().includes(q)
+  );
+
   const fetchTrainees = async () => {
-    // Get trainee user_ids
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("user_id")
-      .eq("role", "trainee");
+    const { data: roles } = await supabase.from("user_roles").select("user_id").eq("role", "trainee");
     if (!roles || roles.length === 0) { setTrainees([]); return; }
-
     const userIds = roles.map((r) => r.user_id);
-
-    // Fetch profiles for these users
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("user_id, full_name, email")
-      .in("user_id", userIds);
-
+    const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email").in("user_id", userIds);
     const profileMap = new Map((profiles || []).map((p) => [p.user_id, p]));
-
     const enriched: TraineeRow[] = [];
     for (const role of roles) {
       const profile = profileMap.get(role.user_id);
-      const { data: pkgs } = await supabase
-        .from("trainee_packages")
-        .select("remaining_credits, is_active, packages(name)")
-        .eq("trainee_id", role.user_id);
-      enriched.push({
-        user_id: role.user_id,
-        full_name: profile?.full_name || "",
-        email: profile?.email || "",
-        trainee_packages: (pkgs || []) as unknown as TraineeRow["trainee_packages"],
-      });
+      const { data: pkgs } = await supabase.from("trainee_packages").select("remaining_credits, is_active, packages(name)").eq("trainee_id", role.user_id);
+      enriched.push({ user_id: role.user_id, full_name: profile?.full_name || "", email: profile?.email || "", trainee_packages: (pkgs || []) as unknown as TraineeRow["trainee_packages"] });
     }
     setTrainees(enriched);
   };
 
   useEffect(() => {
     const fetchPackages = async () => {
-      const { data } = await supabase
-        .from("packages")
-        .select("id, name, credit_count, expiry_days")
-        .eq("is_active", true);
+      const { data } = await supabase.from("packages").select("id, name, credit_count, expiry_days").eq("is_active", true);
       if (data) setPackages(data);
     };
     fetchTrainees();
     fetchPackages();
   }, []);
 
-  const openAssignDialog = (trainee: TraineeRow) => {
-    setSelectedTrainee(trainee);
-    setSelectedPackageId("");
-    setDialogOpen(true);
-  };
+  const openAssignDialog = (trainee: TraineeRow) => { setSelectedTrainee(trainee); setSelectedPackageId(""); setDialogOpen(true); };
 
   const handleAssign = async () => {
     if (!selectedTrainee || !selectedPackageId) return;
     setAssigning(true);
     const pkg = packages.find((p) => p.id === selectedPackageId);
     if (!pkg) return;
-
-    const { error } = await supabase.from("trainee_packages").insert({
-      trainee_id: selectedTrainee.user_id,
-      package_id: selectedPackageId,
-      remaining_credits: pkg.credit_count,
-      expires_at: addDays(new Date(), pkg.expiry_days).toISOString(),
-    });
-
+    const { error } = await supabase.from("trainee_packages").insert({ trainee_id: selectedTrainee.user_id, package_id: selectedPackageId, remaining_credits: pkg.credit_count, expires_at: addDays(new Date(), pkg.expiry_days).toISOString() });
     setAssigning(false);
-    if (error) {
-      toast.error(t("admin.trainees.assignFailed"));
-    } else {
-      toast.success(t("admin.trainees.packageAssigned"));
-      setDialogOpen(false);
-      fetchTrainees();
-    }
+    if (error) { toast.error(t("admin.trainees.assignFailed")); } else { toast.success(t("admin.trainees.packageAssigned")); setDialogOpen(false); fetchTrainees(); }
   };
 
   return (
     <DashboardLayout>
       <h1 className="mb-6 font-serif text-3xl font-bold">{t("admin.trainees.title")}</h1>
+      <div className="mb-4">
+        <ListControls search={lc.search} onSearchChange={lc.setSearch} page={lc.page} totalPages={lc.totalPages} onPageChange={lc.setPage} pageSize={lc.pageSize} onPageSizeChange={lc.setPageSize} totalItems={lc.totalItems} />
+      </div>
       <Card>
         <CardContent className="p-0">
           <Table>
@@ -127,33 +95,24 @@ export default function AdminTrainees() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {trainees.map((tr) => {
+              {lc.paginated.map((tr) => {
                 const activePkg = tr.trainee_packages.find((p) => p.is_active);
                 return (
                   <TableRow key={tr.user_id}>
                     <TableCell>{tr.full_name || "—"}</TableCell>
                     <TableCell>{tr.email || "—"}</TableCell>
-                    <TableCell>
-                      {activePkg?.packages?.name || (
-                        <Badge variant="secondary">{t("admin.trainees.none")}</Badge>
-                      )}
-                    </TableCell>
+                    <TableCell>{activePkg?.packages?.name || <Badge variant="secondary">{t("admin.trainees.none")}</Badge>}</TableCell>
                     <TableCell>{activePkg ? activePkg.remaining_credits : "—"}</TableCell>
                     <TableCell>
                       <Button variant="outline" size="sm" onClick={() => openAssignDialog(tr)}>
-                        <Package className="mr-1 h-4 w-4" />
-                        {t("admin.trainees.assignPackage")}
+                        <Package className="mr-1 h-4 w-4" />{t("admin.trainees.assignPackage")}
                       </Button>
                     </TableCell>
                   </TableRow>
                 );
               })}
-              {trainees.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                    {t("admin.trainees.noTrainees")}
-                  </TableCell>
-                </TableRow>
+              {lc.paginated.length === 0 && (
+                <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">{t("admin.trainees.noTrainees")}</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
@@ -162,30 +121,14 @@ export default function AdminTrainees() {
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {t("admin.trainees.assignPackage")} — {selectedTrainee?.full_name}
-            </DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle>{t("admin.trainees.assignPackage")} — {selectedTrainee?.full_name}</DialogTitle></DialogHeader>
           <Select value={selectedPackageId} onValueChange={setSelectedPackageId}>
-            <SelectTrigger>
-              <SelectValue placeholder={t("admin.trainees.selectPackage")} />
-            </SelectTrigger>
-            <SelectContent>
-              {packages.map((pkg) => (
-                <SelectItem key={pkg.id} value={pkg.id}>
-                  {pkg.name} ({pkg.credit_count} {t("admin.packages.credits")})
-                </SelectItem>
-              ))}
-            </SelectContent>
+            <SelectTrigger><SelectValue placeholder={t("admin.trainees.selectPackage")} /></SelectTrigger>
+            <SelectContent>{packages.map((pkg) => <SelectItem key={pkg.id} value={pkg.id}>{pkg.name} ({pkg.credit_count} {t("admin.packages.credits")})</SelectItem>)}</SelectContent>
           </Select>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              {t("common.cancel")}
-            </Button>
-            <Button onClick={handleAssign} disabled={!selectedPackageId || assigning}>
-              {assigning ? t("admin.trainees.assigning") : t("admin.trainees.assignPackage")}
-            </Button>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleAssign} disabled={!selectedPackageId || assigning}>{assigning ? t("admin.trainees.assigning") : t("admin.trainees.assignPackage")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

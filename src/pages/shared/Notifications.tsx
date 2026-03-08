@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Bell, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { ListControls, useListControls } from "@/components/ListControls";
 
 interface Notification { id: string; title: string; message: string; is_read: boolean; created_at: string; }
 
@@ -14,6 +15,10 @@ export default function NotificationsPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const lc = useListControls<Notification>(notifications, (n, q) =>
+    n.title.toLowerCase().includes(q) || n.message.toLowerCase().includes(q)
+  );
 
   const fetchNotifications = async () => {
     if (!user) return;
@@ -31,8 +36,11 @@ export default function NotificationsPage() {
   return (
     <DashboardLayout>
       <h1 className="mb-6 font-serif text-3xl font-bold">{t("notifications.title")}</h1>
+      <div className="mb-4">
+        <ListControls search={lc.search} onSearchChange={lc.setSearch} page={lc.page} totalPages={lc.totalPages} onPageChange={lc.setPage} pageSize={lc.pageSize} onPageSizeChange={lc.setPageSize} totalItems={lc.totalItems} />
+      </div>
       <div className="space-y-3">
-        {notifications.map((n) => (
+        {lc.paginated.map((n) => (
           <Card key={n.id} className={n.is_read ? "opacity-60" : ""}>
             <CardContent className="flex items-start gap-3 p-4">
               <Bell className="mt-0.5 h-5 w-5 text-primary shrink-0" />
@@ -45,7 +53,7 @@ export default function NotificationsPage() {
             </CardContent>
           </Card>
         ))}
-        {notifications.length === 0 && (<Card><CardContent className="py-8 text-center text-muted-foreground">{t("notifications.empty")}</CardContent></Card>)}
+        {lc.paginated.length === 0 && (<Card><CardContent className="py-8 text-center text-muted-foreground">{t("notifications.empty")}</CardContent></Card>)}
       </div>
     </DashboardLayout>
   );

@@ -14,6 +14,9 @@ export default {
     noData: "No data",
     loading: "Loading…",
     error: "Error",
+    search: "Search…",
+    showing: "{{from}}–{{to}} of {{total}}",
+    all: "All",
   },
   roles: {
     admin: "Administrator",
