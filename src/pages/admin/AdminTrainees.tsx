@@ -5,13 +5,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Package, Pencil } from "lucide-react";
+import { Package, Pencil, UserPlus } from "lucide-react";
 import { addDays } from "date-fns";
 import { ListControls, useListControls } from "@/components/ListControls";
 
@@ -44,6 +45,11 @@ export default function AdminTrainees() {
   const [editName, setEditName] = useState("");
   const [editCredits, setEditCredits] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // Invite dialog state
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmails, setInviteEmails] = useState("");
+  const [inviting, setInviting] = useState(false);
 
   const lc = useListControls<TraineeRow>(trainees, (tr, q) =>
     tr.full_name.toLowerCase().includes(q) || tr.email.toLowerCase().includes(q)
@@ -138,9 +144,58 @@ export default function AdminTrainees() {
     fetchTrainees();
   };
 
+  const handleInvite = async () => {
+    const emails = inviteEmails
+      .split(/[\n,;]+/)
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+
+    if (emails.length === 0) {
+      toast.error(t("admin.trainees.inviteNoValid"));
+      return;
+    }
+
+    setInviting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await supabase.functions.invoke("invite-users", {
+        body: { emails },
+      });
+
+      if (res.error) {
+        toast.error(res.error.message);
+        setInviting(false);
+        return;
+      }
+
+      const { invited, alreadyExists, failed } = res.data;
+      if (invited.length > 0) {
+        toast.success(t("admin.trainees.inviteSuccess", { count: invited.length }));
+      }
+      if (alreadyExists.length > 0) {
+        toast.warning(t("admin.trainees.inviteAlreadyExists", { count: alreadyExists.length, emails: alreadyExists.join(", ") }));
+      }
+      if (failed.length > 0) {
+        toast.error(t("admin.trainees.inviteFailed", { count: failed.length }));
+      }
+
+      setInviteEmails("");
+      setInviteOpen(false);
+      fetchTrainees();
+    } catch (err) {
+      toast.error(t("common.error"));
+    }
+    setInviting(false);
+  };
+
   return (
     <DashboardLayout>
-      <h1 className="mb-6 font-serif text-3xl font-bold">{t("admin.trainees.title")}</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="font-serif text-3xl font-bold">{t("admin.trainees.title")}</h1>
+        <Button onClick={() => setInviteOpen(true)}>
+          <UserPlus className="mr-2 h-4 w-4" />{t("admin.trainees.inviteTrainees")}
+        </Button>
+      </div>
       <div className="mb-4">
         <ListControls search={lc.search} onSearchChange={lc.setSearch} page={lc.page} totalPages={lc.totalPages} onPageChange={lc.setPage} pageSize={lc.pageSize} onPageSizeChange={lc.setPageSize} totalItems={lc.totalItems} />
       </div>
@@ -218,6 +273,31 @@ export default function AdminTrainees() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>{t("common.cancel")}</Button>
             <Button onClick={handleEdit} disabled={saving || !editName.trim()}>{saving ? t("admin.trainees.saving") : t("common.save")}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invite Trainees Dialog */}
+      <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("admin.trainees.inviteTitle")}</DialogTitle>
+            <DialogDescription>{t("admin.trainees.inviteDesc")}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label>{t("admin.trainees.inviteEmails")}</Label>
+            <Textarea
+              value={inviteEmails}
+              onChange={(e) => setInviteEmails(e.target.value)}
+              placeholder={t("admin.trainees.invitePlaceholder")}
+              rows={6}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setInviteOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleInvite} disabled={inviting || !inviteEmails.trim()}>
+              {inviting ? t("admin.trainees.sending") : t("admin.trainees.sendInvites")}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
