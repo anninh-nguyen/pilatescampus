@@ -44,11 +44,42 @@ export default function TraineeBookings() {
   const cancel = async (booking: Booking) => {
     if (!booking.class_slots) return;
     const hoursUntil = differenceInHours(new Date(booking.class_slots.start_time), new Date());
-    if (hoursUntil < 24) { toast({ title: t("trainee.bookings.cannotCancel"), description: t("trainee.bookings.cancelPolicy"), variant: "destructive" }); return; }
+
+    // Fetch cancellation tiers
+    const { data: tiers } = await supabase
+      .from("cancellation_policies")
+      .select("hours_before, refund_percentage")
+      .order("hours_before", { ascending: false });
+
+    const sortedTiers: CancellationTier[] = (tiers as unknown as CancellationTier[]) || [];
+
+    // Find matching tier (first where hoursUntil >= hours_before)
+    const matchedTier = sortedTiers.find((t) => hoursUntil >= t.hours_before);
+    const refundPct = matchedTier ? matchedTier.refund_percentage : 0;
+
+    if (refundPct === 0) {
+      toast({ title: t("trainee.bookings.cannotCancel"), description: t("trainee.bookings.noRefund"), variant: "destructive" });
+      return;
+    }
+
     await supabase.from("bookings").update({ status: "cancelled" }).eq("id", booking.id);
+
+    // Refund credits based on percentage
     const { data: pkg } = await supabase.from("trainee_packages").select("remaining_credits").eq("id", booking.trainee_package_id).single();
-    if (pkg) { await supabase.from("trainee_packages").update({ remaining_credits: pkg.remaining_credits + 1 }).eq("id", booking.trainee_package_id); }
-    toast({ title: t("trainee.bookings.bookingCancelled"), description: t("trainee.bookings.creditRefunded") });
+    if (pkg) {
+      // Determine the credit cost of the booking (default 1)
+      const creditCost = 1; // Base cost; could be enhanced to store actual cost on booking
+      const refunded = Math.round((creditCost * refundPct) / 100);
+      if (refunded > 0) {
+        await supabase.from("trainee_packages").update({ remaining_credits: pkg.remaining_credits + refunded }).eq("id", booking.trainee_package_id);
+      }
+      const desc = refundPct === 100
+        ? t("trainee.bookings.fullRefund")
+        : t("trainee.bookings.partialRefund", { percentage: refundPct, refunded });
+      toast({ title: t("trainee.bookings.bookingCancelled"), description: desc });
+    } else {
+      toast({ title: t("trainee.bookings.bookingCancelled") });
+    }
     fetchBookings();
   };
 
