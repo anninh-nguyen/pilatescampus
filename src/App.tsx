@@ -13,6 +13,7 @@ import AdminTrainers from "./pages/admin/AdminTrainers";
 import AdminTrainees from "./pages/admin/AdminTrainees";
 import AdminPackages from "./pages/admin/AdminPackages";
 import AdminSchedule from "./pages/admin/AdminSchedule";
+import AdminPricing from "./pages/admin/AdminPricing";
 import AdminReports from "./pages/admin/AdminReports";
 import TrainerSchedule from "./pages/trainer/TrainerSchedule";
 import TrainerHistory from "./pages/trainer/TrainerHistory";
