@@ -62,6 +62,30 @@ export type Database = {
           },
         ]
       }
+      cancellation_policies: {
+        Row: {
+          created_at: string
+          hours_before: number
+          id: string
+          refund_percentage: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hours_before: number
+          id?: string
+          refund_percentage?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hours_before?: number
+          id?: string
+          refund_percentage?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       class_slots: {
         Row: {
           capacity: number

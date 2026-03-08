@@ -22,6 +22,7 @@ import {
   CalendarDays,
   DollarSign,
   BarChart3,
+  ShieldAlert,
   Calendar,
   History,
   Bell,
@@ -39,6 +40,7 @@ const adminLinks = [
   { labelKey: "nav.schedule", icon: CalendarDays, path: "/admin/schedule" },
   { labelKey: "nav.pricing", icon: DollarSign, path: "/admin/pricing" },
   { labelKey: "nav.reports", icon: BarChart3, path: "/admin/reports" },
+  { labelKey: "nav.cancellation", icon: ShieldAlert, path: "/admin/cancellation" },
 ];
 
 const trainerLinks = [

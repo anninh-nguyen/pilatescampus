@@ -57,6 +57,7 @@ export default {
     bookSessions: "Book Sessions",
     myBookings: "My Bookings",
     myProfile: "My Profile",
+    cancellation: "Cancellation Policy",
   },
   admin: {
     dashboard: {
@@ -172,6 +173,19 @@ export default {
       periodDeleted: "Time period deleted",
       noPeriods: "No time periods configured",
     },
+    cancellation: {
+      title: "Cancellation Policy",
+      description: "Configure tiered cancellation rules. Tiers are matched from highest hours_before downward. The first tier where the trainee's advance notice meets or exceeds hours_before applies.",
+      addTier: "Add Tier",
+      editTier: "Edit Tier",
+      hoursBefore: "Hours Before Session",
+      refundPercentage: "Refund %",
+      tierCreated: "Cancellation tier created",
+      tierUpdated: "Cancellation tier updated",
+      tierDeleted: "Cancellation tier deleted",
+      noTiers: "No cancellation tiers configured",
+      lessThanMin: "Less than minimum",
+    },
   },
   trainer: {
     schedule: {
@@ -240,6 +254,9 @@ export default {
       recurring: "Recurring",
       cannotCancel: "Cannot cancel",
       cancelPolicy: "Cancellations must be made at least 24 hours before the session.",
+      noRefund: "No refund — too close to session start.",
+      partialRefund: "{{percentage}}% of credits refunded ({{refunded}} credit(s)).",
+      fullRefund: "Full credit refunded.",
       bookingCancelled: "Booking cancelled",
       creditRefunded: "Credit has been refunded.",
       noBookings: "No bookings yet",

@@ -15,6 +15,7 @@ import AdminPackages from "./pages/admin/AdminPackages";
 import AdminSchedule from "./pages/admin/AdminSchedule";
 import AdminPricing from "./pages/admin/AdminPricing";
 import AdminReports from "./pages/admin/AdminReports";
+import AdminCancellation from "./pages/admin/AdminCancellation";
 import TrainerSchedule from "./pages/trainer/TrainerSchedule";
 import TrainerHistory from "./pages/trainer/TrainerHistory";
 import TrainerProfile from "./pages/trainer/TrainerProfile";
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/admin/schedule" element={<ProtectedRoute allowedRoles={["admin"]}><AdminSchedule /></ProtectedRoute>} />
             <Route path="/admin/pricing" element={<ProtectedRoute allowedRoles={["admin"]}><AdminPricing /></ProtectedRoute>} />
             <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={["admin"]}><AdminReports /></ProtectedRoute>} />
+            <Route path="/admin/cancellation" element={<ProtectedRoute allowedRoles={["admin"]}><AdminCancellation /></ProtectedRoute>} />
 
             {/* Trainer routes */}
             <Route path="/trainer" element={<ProtectedRoute allowedRoles={["trainer"]}><TrainerSchedule /></ProtectedRoute>} />
