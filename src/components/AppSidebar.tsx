@@ -20,6 +20,7 @@ import {
   UserCheck,
   Package,
   CalendarDays,
+  DollarSign,
   BarChart3,
   Calendar,
   History,
@@ -35,6 +36,7 @@ const adminLinks = [
   { labelKey: "nav.trainees", icon: Users, path: "/admin/trainees" },
   { labelKey: "nav.packages", icon: Package, path: "/admin/packages" },
   { labelKey: "nav.schedule", icon: CalendarDays, path: "/admin/schedule" },
+  { labelKey: "nav.pricing", icon: DollarSign, path: "/admin/pricing" },
   { labelKey: "nav.reports", icon: BarChart3, path: "/admin/reports" },
 ];
 
