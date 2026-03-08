@@ -103,7 +103,7 @@ export default function TraineeBooking() {
         const slotCost = getCreditCost(s.start_time, pricingPeriods);
         if (creditsLeft < slotCost) break;
         bookings.push({ trainee_id: user.id, class_slot_id: s.id, trainee_package_id: activePkgId, is_recurring: true });
-        creditsLeft -= slotCost;
+        creditsLeft = Math.round((creditsLeft - slotCost) * 10) / 10;
       }
       if (bookings.length === 0) { toast({ title: t("trainee.booking.noMatchingSlots"), description: t("trainee.booking.noMatchingSlotsDesc"), variant: "destructive" }); setIsBooking(false); return; }
       const { error } = await supabase.from("bookings").insert(bookings);
