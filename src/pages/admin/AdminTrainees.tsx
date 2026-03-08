@@ -91,9 +91,23 @@ export default function AdminTrainees() {
     }
 
     const totalCredits = Math.round((currentCredits + Number(pkg.credit_count)) * 10) / 10;
-    const { error } = await supabase.from("trainee_packages").insert({ trainee_id: selectedTrainee.user_id, package_id: selectedPackageId, remaining_credits: totalCredits, expires_at: addDays(new Date(), pkg.expiry_days).toISOString() });
+    const { data: newPkg, error } = await supabase.from("trainee_packages").insert({ trainee_id: selectedTrainee.user_id, package_id: selectedPackageId, remaining_credits: totalCredits, expires_at: addDays(new Date(), pkg.expiry_days).toISOString() }).select("id").single();
     setAssigning(false);
-    if (error) { toast.error(t("admin.trainees.assignFailed")); } else { toast.success(t("admin.trainees.packageAssigned")); setDialogOpen(false); fetchTrainees(); }
+    if (error) { toast.error(t("admin.trainees.assignFailed")); } else {
+      toast.success(t("admin.trainees.packageAssigned"));
+      // Check first-time and referral bonuses
+      if (newPkg) {
+        const { data: ftBonus } = await supabase.rpc("check_first_time_bonus", { _user_id: selectedTrainee.user_id, _package_id: newPkg.id });
+        if (ftBonus && Number(ftBonus) > 0) {
+          toast.success(t("admin.trainees.bonusAwarded", { credits: ftBonus, type: "first-time" }));
+        }
+        const { data: refBonus } = await supabase.rpc("check_referral_bonus", { _new_user_id: selectedTrainee.user_id, _package_id: newPkg.id });
+        if (refBonus && Number(refBonus) > 0) {
+          toast.success(t("admin.trainees.bonusAwarded", { credits: refBonus, type: "referral" }));
+        }
+      }
+      setDialogOpen(false); fetchTrainees();
+    }
   };
 
   const openEditDialog = (trainee: TraineeRow) => {
