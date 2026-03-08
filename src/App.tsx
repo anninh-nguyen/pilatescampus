@@ -17,6 +17,7 @@ import AdminPricing from "./pages/admin/AdminPricing";
 import AdminReports from "./pages/admin/AdminReports";
 import TrainerSchedule from "./pages/trainer/TrainerSchedule";
 import TrainerHistory from "./pages/trainer/TrainerHistory";
+import TrainerProfile from "./pages/trainer/TrainerProfile";
 import TraineePackage from "./pages/trainee/TraineePackage";
 import TraineeBooking from "./pages/trainee/TraineeBooking";
 import TraineeBookings from "./pages/trainee/TraineeBookings";
