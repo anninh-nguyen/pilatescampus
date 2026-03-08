@@ -56,6 +56,7 @@ export default {
     myPackage: "My Package",
     bookSessions: "Book Sessions",
     myBookings: "My Bookings",
+    myProfile: "My Profile",
   },
   admin: {
     dashboard: {

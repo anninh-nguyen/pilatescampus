@@ -56,6 +56,7 @@ export default {
     myPackage: "Gói tập của tôi",
     bookSessions: "Đặt buổi tập",
     myBookings: "Lịch đã đặt",
+    myProfile: "Hồ sơ của tôi",
   },
   admin: {
     dashboard: {
