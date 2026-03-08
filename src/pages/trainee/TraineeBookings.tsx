@@ -12,6 +12,9 @@ import { useToast } from "@/hooks/use-toast";
 import { format, differenceInHours } from "date-fns";
 import { ListControls, useListControls } from "@/components/ListControls";
 
+interface CancellationTier { hours_before: number; refund_percentage: number; }
+import { ListControls, useListControls } from "@/components/ListControls";
+
 interface Booking {
   id: string; status: string; is_recurring: boolean; trainee_package_id: string;
   class_slots: { title: string; start_time: string; end_time: string; class_type: string } | null;
