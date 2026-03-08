@@ -89,6 +89,8 @@ export default {
     selectTraineeFirst: "Vui lòng chọn học viên trước",
     noPackage: "chưa có gói",
     bookedSuccess: "Đã đặt buổi tập cho {{name}}",
+    notificationTitle: "Buổi tập đã được đặt cho bạn",
+    notificationMessage: "Bạn đã được đặt lịch {{class}} vào {{date}} lúc {{time}}.",
   },
   manageBookings: {
     title: "Quản lý đặt chỗ",

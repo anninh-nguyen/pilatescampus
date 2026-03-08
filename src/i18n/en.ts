@@ -89,6 +89,8 @@ export default {
     selectTraineeFirst: "Please select a trainee first",
     noPackage: "no package",
     bookedSuccess: "Session booked for {{name}}",
+    notificationTitle: "Session Booked for You",
+    notificationMessage: "You have been booked for {{class}} on {{date}} at {{time}}.",
   },
   manageBookings: {
     title: "Manage Bookings",
