@@ -119,7 +119,7 @@ export default function AdminTrainers() {
                 </TableRow>
               ))}
               {lc.paginated.length === 0 && (
-                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-8">{t("admin.trainers.noTrainers")}</TableCell></TableRow>
+                <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">{t("admin.trainers.noTrainers")}</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
