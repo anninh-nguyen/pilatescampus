@@ -41,17 +41,17 @@ export default function TrainerSchedule() {
 
       // Get trainee names separately
       const traineeIds = [...new Set(data.flatMap((s: any) => (s.bookings || []).map((b: any) => b.trainee_id)).filter(Boolean))];
-      let nameMap = new Map<string, string>();
+      let profileMap = new Map<string, TraineeProfile>();
       if (traineeIds.length > 0) {
-        const { data: profiles } = await supabase.from("profiles").select("user_id, full_name").in("user_id", traineeIds);
-        if (profiles) profiles.forEach((p) => nameMap.set(p.user_id, p.full_name));
+        const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email, phone").in("user_id", traineeIds);
+        if (profiles) profiles.forEach((p) => profileMap.set(p.user_id, { full_name: p.full_name, email: p.email, phone: p.phone }));
       }
 
       const enriched = data.map((s: any) => ({
         ...s,
         bookings: (s.bookings || []).map((b: any) => ({
           ...b,
-          profiles: { full_name: nameMap.get(b.trainee_id) || "Trainee" },
+          profiles: profileMap.get(b.trainee_id) || { full_name: "Trainee" },
         })),
       }));
       setSessions(enriched as unknown as SessionRow[]);
