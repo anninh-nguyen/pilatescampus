@@ -16,6 +16,7 @@ import AdminSchedule from "./pages/admin/AdminSchedule";
 import AdminPricing from "./pages/admin/AdminPricing";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminCancellation from "./pages/admin/AdminCancellation";
+import AdminCompensation from "./pages/admin/AdminCompensation";
 import TrainerSchedule from "./pages/trainer/TrainerSchedule";
 import TrainerHistory from "./pages/trainer/TrainerHistory";
 import TrainerProfile from "./pages/trainer/TrainerProfile";
