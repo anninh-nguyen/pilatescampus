@@ -10,9 +10,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import { ListControls, useListControls } from "@/components/ListControls";
 
+interface TraineeProfile { full_name: string; email?: string; phone?: string | null }
+
 interface SessionRow {
   id: string; start_time: string; end_time: string; title: string; class_type: string;
-  bookings: { trainee_id: string; status: string; profiles: { full_name: string } | null }[];
+  bookings: { trainee_id: string; status: string; profiles: TraineeProfile | null }[];
 }
 
 export default function TrainerSchedule() {
