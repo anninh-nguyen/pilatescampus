@@ -55,6 +55,7 @@ const App = () => (
             <Route path="/trainer/history" element={<ProtectedRoute allowedRoles={["trainer"]}><TrainerHistory /></ProtectedRoute>} />
             <Route path="/trainer/profile" element={<ProtectedRoute allowedRoles={["trainer"]}><TrainerProfile /></ProtectedRoute>} />
             <Route path="/trainer/notifications" element={<ProtectedRoute allowedRoles={["trainer"]}><Notifications /></ProtectedRoute>} />
+            <Route path="/trainer/book-for-trainee" element={<ProtectedRoute allowedRoles={["trainer"]}><BookOnBehalf /></ProtectedRoute>} />
 
             {/* Trainee routes */}
             <Route path="/trainee" element={<ProtectedRoute allowedRoles={["trainee"]}><TraineePackage /></ProtectedRoute>} />
