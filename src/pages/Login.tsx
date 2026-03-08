@@ -63,6 +63,23 @@ export default function Login() {
     setIsLoading(false);
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast({ title: t("login.enterEmailFirst"), variant: "destructive" });
+      return;
+    }
+    setIsLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) {
+      toast({ title: t("login.resetFailed"), description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: t("login.resetEmailSent"), description: t("login.resetEmailSentDesc") });
+    }
+    setIsLoading(false);
+  };
+
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     const result = await lovable.auth.signInWithOAuth("google", {
@@ -111,6 +128,11 @@ export default function Login() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-3">
+                  <div className="flex w-full justify-end">
+                    <button type="button" className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline" onClick={handleForgotPassword} disabled={isLoading}>
+                      {t("login.forgotPassword")}
+                    </button>
+                  </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? t("login.signingIn") : t("login.signIn")}
                   </Button>
