@@ -276,6 +276,31 @@ export default function AdminTrainees() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Invite Trainees Dialog */}
+      <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("admin.trainees.inviteTitle")}</DialogTitle>
+            <DialogDescription>{t("admin.trainees.inviteDesc")}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label>{t("admin.trainees.inviteEmails")}</Label>
+            <Textarea
+              value={inviteEmails}
+              onChange={(e) => setInviteEmails(e.target.value)}
+              placeholder={t("admin.trainees.invitePlaceholder")}
+              rows={6}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setInviteOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleInvite} disabled={inviting || !inviteEmails.trim()}>
+              {inviting ? t("admin.trainees.sending") : t("admin.trainees.sendInvites")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
