@@ -186,6 +186,16 @@ export default {
       title: "Lịch sử buổi tập",
       empty: "Các buổi tập đã hoàn thành sẽ hiển thị tại đây.",
     },
+    profile: {
+      title: "Hồ sơ của tôi",
+      personalInfo: "Thông tin cá nhân",
+      fullName: "Họ và tên",
+      phone: "Số điện thoại",
+      specialty: "Chuyên môn",
+      bio: "Giới thiệu",
+      updateSuccess: "Cập nhật hồ sơ thành công",
+      updateFailed: "Cập nhật hồ sơ thất bại",
+    },
   },
   trainee: {
     package: {
