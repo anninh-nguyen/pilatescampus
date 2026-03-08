@@ -142,7 +142,7 @@ export default function TraineeBooking() {
                 <CardContent className="flex items-center justify-between p-4">
                   <div>
                     <p className="font-medium">{s.title}</p>
-                    <p className="text-sm text-muted-foreground">{format(new Date(s.start_time), "p")} – {format(new Date(s.end_time), "p")} · {(s.trainers as any)?.profiles?.full_name || "TBD"}</p>
+                    <p className="text-sm text-muted-foreground">{format(new Date(s.start_time), "p")} – {format(new Date(s.end_time), "p")} · {s.trainer_name || "TBD"}</p>
                     <div className="mt-1 flex gap-2">
                       <Badge variant="secondary" className="capitalize">{s.class_type}</Badge>
                       <Badge variant={isFull ? "destructive" : "default"}>{t("trainee.booking.spots", { booked: s.booking_count, total: s.capacity })}</Badge>
