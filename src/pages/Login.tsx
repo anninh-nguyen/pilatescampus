@@ -83,11 +83,27 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast({ title: t("login.googleFailed"), description: String(result.error), variant: "destructive" });
+    const isPreview =
+      window.location.hostname.includes("lovableproject.com") ||
+      window.location.hostname.includes("localhost");
+
+    if (isPreview) {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast({ title: t("login.googleFailed"), description: String(result.error), variant: "destructive" });
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+      if (error) {
+        toast({ title: t("login.googleFailed"), description: error.message, variant: "destructive" });
+      }
     }
     setIsLoading(false);
   };
