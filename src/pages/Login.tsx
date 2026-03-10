@@ -81,16 +81,6 @@ export default function Login() {
     setIsLoading(false);
   };
 
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast({ title: t("login.googleFailed"), description: String(result.error), variant: "destructive" });
-    }
-    setIsLoading(false);
-  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
