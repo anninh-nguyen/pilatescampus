@@ -122,7 +122,17 @@ export default function Login() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-3">
-                  <div className="flex w-full justify-end">
+                  <div className="flex w-full items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="remember-me"
+                        checked={rememberMe}
+                        onCheckedChange={(checked) => setRememberMe(checked === true)}
+                      />
+                      <Label htmlFor="remember-me" className="text-sm font-normal text-muted-foreground cursor-pointer">
+                        {t("login.rememberMe")}
+                      </Label>
+                    </div>
                     <button type="button" className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline" onClick={handleForgotPassword} disabled={isLoading}>
                       {t("login.forgotPassword")}
                     </button>
