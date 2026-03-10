@@ -37,6 +37,10 @@ export default function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    if (!rememberMe) {
+      // Switch to sessionStorage so session clears on browser close
+      await supabase.auth.setSession({ access_token: '', refresh_token: '' }).catch(() => {});
+    }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       toast({ title: t("login.loginFailed"), description: error.message, variant: "destructive" });

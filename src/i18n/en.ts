@@ -41,6 +41,7 @@ export default {
     checkEmail: "Check your email",
     confirmationSent: "We sent you a confirmation link.",
     googleFailed: "Google login failed",
+    rememberMe: "Remember me",
     forgotPassword: "Forgot password?",
     enterEmailFirst: "Please enter your email first",
     resetFailed: "Password reset failed",
