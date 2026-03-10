@@ -1,5 +1,9 @@
-// Fix react-i18next type compatibility with React 18
-declare module "react-i18next" {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  export interface ReactI18NextChildren extends React.ReactNode {}
+// Fix react-i18next children type compatibility with React 18
+// See: https://github.com/i18next/react-i18next/issues/1543
+import "i18next";
+
+declare module "i18next" {
+  interface CustomTypeOptions {
+    allowObjectInHTMLChildren: true;
+  }
 }
