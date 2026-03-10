@@ -41,6 +41,7 @@ export default {
     checkEmail: "Kiểm tra email",
     confirmationSent: "Chúng tôi đã gửi liên kết xác nhận cho bạn.",
     googleFailed: "Đăng nhập Google thất bại",
+    rememberMe: "Ghi nhớ đăng nhập",
     forgotPassword: "Quên mật khẩu?",
     enterEmailFirst: "Vui lòng nhập email trước",
     resetFailed: "Gửi liên kết đặt lại mật khẩu thất bại",

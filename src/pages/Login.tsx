@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +19,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -38,6 +40,11 @@ export default function Login() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       toast({ title: t("login.loginFailed"), description: error.message, variant: "destructive" });
+    } else if (!rememberMe) {
+      // If not remembering, clear session on browser/tab close
+      window.addEventListener("beforeunload", () => {
+        supabase.auth.signOut();
+      }, { once: true });
     }
     setIsLoading(false);
   };
@@ -120,7 +127,17 @@ export default function Login() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-3">
-                  <div className="flex w-full justify-end">
+                  <div className="flex w-full items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="remember-me"
+                        checked={rememberMe}
+                        onCheckedChange={(checked) => setRememberMe(checked === true)}
+                      />
+                      <Label htmlFor="remember-me" className="text-sm font-normal text-muted-foreground cursor-pointer">
+                        {t("login.rememberMe")}
+                      </Label>
+                    </div>
                     <button type="button" className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline" onClick={handleForgotPassword} disabled={isLoading}>
                       {t("login.forgotPassword")}
                     </button>
