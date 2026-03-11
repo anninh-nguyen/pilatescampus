@@ -56,32 +56,22 @@ export default function BookOnBehalf() {
       const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, email");
       if (!profiles) return;
 
-      // Get all trainee role users
       const { data: roles } = await supabase.from("user_roles").select("user_id").eq("role", "trainee");
       if (!roles) return;
       let traineeUserIds = new Set(roles.map((r) => r.user_id));
 
-      // For trainers: only show trainees who have booked at least one of this trainer's classes
       if (role === "trainer" && user) {
         const { data: trainer } = await supabase.from("trainers").select("id").eq("user_id", user.id).single();
         if (!trainer) { setTrainees([]); return; }
-
-        // Get all class slot IDs for this trainer
         const { data: trainerSlots } = await supabase.from("class_slots").select("id").eq("trainer_id", trainer.id);
         if (!trainerSlots || trainerSlots.length === 0) { setTrainees([]); return; }
-
         const slotIds = trainerSlots.map((s) => s.id);
-        // Get distinct trainee IDs who have bookings in those slots
         const { data: bookings } = await supabase.from("bookings").select("trainee_id").in("class_slot_id", slotIds);
         const bookedTraineeIds = new Set((bookings || []).map((b) => b.trainee_id));
-
-        // Intersect: must be both a trainee role AND have booked with this trainer
         traineeUserIds = new Set([...traineeUserIds].filter((id) => bookedTraineeIds.has(id)));
       }
 
-      // Get active packages
       const { data: pkgs } = await supabase.from("trainee_packages").select("id, trainee_id, remaining_credits").eq("is_active", true);
-
       const pkgMap = new Map<string, { id: string; remaining_credits: number }>();
       (pkgs || []).forEach((p) => {
         const existing = pkgMap.get(p.trainee_id);
@@ -94,22 +84,15 @@ export default function BookOnBehalf() {
         .filter((p) => traineeUserIds.has(p.user_id))
         .map((p) => {
           const pkg = pkgMap.get(p.user_id);
-          return {
-            user_id: p.user_id,
-            full_name: p.full_name,
-            email: p.email,
-            pkg_id: pkg?.id || null,
-            remaining_credits: pkg?.remaining_credits || 0,
-          };
+          return { user_id: p.user_id, full_name: p.full_name, email: p.email, pkg_id: pkg?.id || null, remaining_credits: pkg?.remaining_credits || 0 };
         })
         .sort((a, b) => a.full_name.localeCompare(b.full_name));
-
       setTrainees(opts);
     };
     fetchTrainees();
   }, [user, role]);
 
-  // Load slots for selected date (filtered for trainer's classes if trainer role)
+  // Load slots for selected date
   useEffect(() => {
     const fetchSlots = async () => {
       const dayStart = new Date(date); dayStart.setHours(0, 0, 0, 0);
@@ -119,7 +102,6 @@ export default function BookOnBehalf() {
         .gte("start_time", dayStart.toISOString()).lte("start_time", dayEnd.toISOString())
         .order("start_time", { ascending: true });
 
-      // If trainer, filter to their classes only
       if (role === "trainer" && user) {
         const { data: trainer } = await supabase.from("trainers").select("id").eq("user_id", user.id).single();
         if (!trainer) { setSlots([]); return; }
@@ -164,60 +146,53 @@ export default function BookOnBehalf() {
       return;
     }
 
-    const cost = getCreditCost(slot.start_time, pricingPeriods);
-    if (selectedTraineeData.remaining_credits < cost) {
-      toast({ title: t("trainee.booking.noCredits"), variant: "destructive" });
-      return;
-    }
-
     setIsBooking(true);
 
-    const { error } = await supabase.from("bookings").insert({
-      trainee_id: selectedTraineeData.user_id,
-      class_slot_id: slot.id,
-      trainee_package_id: selectedTraineeData.pkg_id,
-    });
-
-    if (error) {
-      const isDuplicate = error.code === "23505";
-      toast({
-        title: isDuplicate ? t("trainee.booking.alreadyBooked") : t("common.error"),
-        description: isDuplicate ? t("trainee.booking.alreadyBookedDesc") : error.message,
-        variant: "destructive",
+    try {
+      const { data, error } = await supabase.rpc("book_single_session", {
+        p_trainee_id: selectedTraineeData.user_id,
+        p_class_slot_id: slot.id,
+        p_trainee_package_id: selectedTraineeData.pkg_id,
       });
+
+      if (error) {
+        toast({ title: t("common.error"), description: error.message, variant: "destructive" });
+        return;
+      }
+
+      const result = data as any;
+      if (!result.success) {
+        const isDuplicate = result.error === "already_booked";
+        toast({
+          title: isDuplicate ? t("trainee.booking.alreadyBooked") : result.error === "class_full" ? t("trainee.booking.classFull") : t("common.error"),
+          description: isDuplicate ? t("trainee.booking.alreadyBookedDesc") : result.error === "class_full" ? t("trainee.booking.classFullDesc") : result.error,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Notify the trainee
+      const slotTime = format(new Date(slot.start_time), "p");
+      const slotDate = format(new Date(slot.start_time), "MMM d");
+      await supabase.from("notifications").insert({
+        user_id: selectedTraineeData.user_id,
+        title: t("bookOnBehalf.notificationTitle"),
+        message: t("bookOnBehalf.notificationMessage", { class: slot.title, date: slotDate, time: slotTime }),
+        type: "booking",
+      });
+
+      // Update local state with new credits from server
+      setTrainees((prev) =>
+        prev.map((tr) =>
+          tr.user_id === selectedTrainee ? { ...tr, remaining_credits: result.remaining_credits } : tr
+        )
+      );
+
+      toast({ title: t("bookOnBehalf.bookedSuccess", { name: selectedTraineeData.full_name }) });
+    } finally {
       setIsBooking(false);
-      return;
+      setDate(new Date(date));
     }
-
-    // Deduct credits
-    const newCredits = Math.round((selectedTraineeData.remaining_credits - cost) * 10) / 10;
-    await supabase.from("trainee_packages").update({ remaining_credits: newCredits }).eq("id", selectedTraineeData.pkg_id);
-
-    // Notify the trainee
-    const slotTime = format(new Date(slot.start_time), "p");
-    const slotDate = format(new Date(slot.start_time), "MMM d");
-    await supabase.from("notifications").insert({
-      user_id: selectedTraineeData.user_id,
-      title: t("bookOnBehalf.notificationTitle"),
-      message: t("bookOnBehalf.notificationMessage", {
-        class: slot.title,
-        date: slotDate,
-        time: slotTime,
-      }),
-      type: "booking",
-    });
-
-    // Update local state
-    setTrainees((prev) =>
-      prev.map((tr) =>
-        tr.user_id === selectedTrainee ? { ...tr, remaining_credits: newCredits } : tr
-      )
-    );
-
-    toast({ title: t("bookOnBehalf.bookedSuccess", { name: selectedTraineeData.full_name }) });
-    setIsBooking(false);
-    // Refresh slots
-    setDate(new Date(date));
   };
 
   return (

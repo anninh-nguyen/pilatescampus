@@ -615,6 +615,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      book_recurring_sessions: {
+        Args: {
+          p_class_slot_id: string
+          p_trainee_id: string
+          p_trainee_package_id: string
+        }
+        Returns: Json
+      }
+      book_single_session: {
+        Args: {
+          p_class_slot_id: string
+          p_trainee_id: string
+          p_trainee_package_id: string
+        }
+        Returns: Json
+      }
       check_first_time_bonus: {
         Args: { _package_id: string; _user_id: string }
         Returns: number
