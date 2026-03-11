@@ -34,7 +34,7 @@ function getCreditCost(slotStartTime: string, pricingPeriods: TimePricing[]): nu
       return p.credit_cost;
     }
   }
-  return 1; // default
+  return 1;
 }
 
 export default function TraineeBooking() {
@@ -67,7 +67,6 @@ export default function TraineeBooking() {
       const { data } = await supabase.from("class_slots").select("*, trainers(user_id)")
         .gte("start_time", dayStart.toISOString()).lte("start_time", dayEnd.toISOString()).order("start_time", { ascending: true });
       if (data) {
-        // Fetch trainer profile names separately
         const trainerUserIds = [...new Set(data.map((s: any) => s.trainers?.user_id).filter(Boolean))];
         let profileMap = new Map<string, string>();
         if (trainerUserIds.length > 0) {
@@ -90,42 +89,55 @@ export default function TraineeBooking() {
     if (slot.booking_count >= slot.capacity) { toast({ title: t("trainee.booking.classFull"), description: t("trainee.booking.classFullDesc"), variant: "destructive" }); return; }
     setIsBooking(true);
 
-    const cost = getCreditCost(slot.start_time, pricingPeriods);
+    try {
+      if (recurring) {
+        const { data, error } = await supabase.rpc("book_recurring_sessions", {
+          p_trainee_id: user.id,
+          p_class_slot_id: slot.id,
+          p_trainee_package_id: activePkgId,
+        });
 
-    if (recurring) {
-      let creditsLeft = remainingCredits;
-      const { data: futureSlots } = await supabase.from("class_slots").select("id, start_time").gte("start_time", new Date().toISOString()).order("start_time", { ascending: true });
-      const targetDay = new Date(slot.start_time).getDay();
-      const targetHour = new Date(slot.start_time).getHours();
-      const targetMin = new Date(slot.start_time).getMinutes();
-      const matchingSlots = (futureSlots || []).filter((s) => { const d = new Date(s.start_time); return d.getDay() === targetDay && d.getHours() === targetHour && d.getMinutes() === targetMin; });
-      const bookings: any[] = [];
-      for (const s of matchingSlots) {
-        const slotCost = getCreditCost(s.start_time, pricingPeriods);
-        if (creditsLeft < slotCost) break;
-        bookings.push({ trainee_id: user.id, class_slot_id: s.id, trainee_package_id: activePkgId, is_recurring: true });
-        creditsLeft = Math.round((creditsLeft - slotCost) * 10) / 10;
+        if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); return; }
+
+        const result = data as any;
+        if (!result.success) {
+          const errKey = result.error === "no_matching_slots" ? "trainee.booking.noMatchingSlots" : "common.error";
+          toast({ title: t(errKey), description: result.error === "no_matching_slots" ? t("trainee.booking.noMatchingSlotsDesc") : result.error, variant: "destructive" });
+          return;
+        }
+
+        setRemainingCredits(result.remaining_credits);
+        toast({ title: t("trainee.booking.recurringCreated"), description: t("trainee.booking.sessionsBooked", { count: result.sessions_booked }) });
+      } else {
+        const cost = getCreditCost(slot.start_time, pricingPeriods);
+        if (remainingCredits < cost) { toast({ title: t("trainee.booking.noCredits"), variant: "destructive" }); return; }
+
+        const { data, error } = await supabase.rpc("book_single_session", {
+          p_trainee_id: user.id,
+          p_class_slot_id: slot.id,
+          p_trainee_package_id: activePkgId,
+        });
+
+        if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); return; }
+
+        const result = data as any;
+        if (!result.success) {
+          const isDuplicate = result.error === "already_booked";
+          toast({
+            title: isDuplicate ? t("trainee.booking.alreadyBooked") : result.error === "class_full" ? t("trainee.booking.classFull") : t("common.error"),
+            description: isDuplicate ? t("trainee.booking.alreadyBookedDesc") : result.error === "class_full" ? t("trainee.booking.classFullDesc") : result.error,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        setRemainingCredits(result.remaining_credits);
+        toast({ title: t("trainee.booking.sessionBooked") });
       }
-      if (bookings.length === 0) { toast({ title: t("trainee.booking.noMatchingSlots"), description: t("trainee.booking.noMatchingSlotsDesc"), variant: "destructive" }); setIsBooking(false); return; }
-      const { error } = await supabase.from("bookings").insert(bookings);
-      if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); setIsBooking(false); return; }
-      await supabase.from("trainee_packages").update({ remaining_credits: creditsLeft }).eq("id", activePkgId);
-      setRemainingCredits(creditsLeft);
-      toast({ title: t("trainee.booking.recurringCreated"), description: t("trainee.booking.sessionsBooked", { count: bookings.length }) });
-    } else {
-      if (remainingCredits < cost) { toast({ title: t("trainee.booking.noCredits"), variant: "destructive" }); setIsBooking(false); return; }
-      const { error } = await supabase.from("bookings").insert({ trainee_id: user.id, class_slot_id: slot.id, trainee_package_id: activePkgId });
-      if (error) {
-        const isDuplicate = error.code === "23505";
-        toast({ title: isDuplicate ? t("trainee.booking.alreadyBooked") : t("common.error"), description: isDuplicate ? t("trainee.booking.alreadyBookedDesc") : error.message, variant: "destructive" });
-        setIsBooking(false); return;
-      }
-      await supabase.from("trainee_packages").update({ remaining_credits: Math.round((remainingCredits - cost) * 10) / 10 }).eq("id", activePkgId);
-      setRemainingCredits((c) => Math.round((c - cost) * 10) / 10);
-      toast({ title: t("trainee.booking.sessionBooked") });
+    } finally {
+      setIsBooking(false);
+      setDate(new Date(date));
     }
-    setIsBooking(false);
-    setDate(new Date(date));
   };
 
   return (
