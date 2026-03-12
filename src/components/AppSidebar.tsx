@@ -52,6 +52,7 @@ const adminLinks = [
   { labelKey: "nav.manageBookings", icon: ClipboardList, path: "/admin/manage-bookings" },
   { labelKey: "nav.promotions", icon: Gift, path: "/admin/promotions" },
   { labelKey: "nav.emailSettings", icon: Mail, path: "/admin/email-settings" },
+  { labelKey: "nav.auditLog", icon: ScrollText, path: "/admin/audit-log" },
 ];
 
 const trainerLinks = [
