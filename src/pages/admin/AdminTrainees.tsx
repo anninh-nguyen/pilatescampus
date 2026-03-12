@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Package, Pencil, UserPlus } from "lucide-react";
+import { Package, Pencil, UserPlus, ShieldCheck } from "lucide-react";
 import { addDays } from "date-fns";
 import { ListControls, useListControls } from "@/components/ListControls";
 
