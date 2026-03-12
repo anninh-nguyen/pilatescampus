@@ -25,6 +25,10 @@ export default function AdminTrainers() {
   const [email, setEmail] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [roleOpen, setRoleOpen] = useState(false);
+  const [roleTrainer, setRoleTrainer] = useState<TrainerRow | null>(null);
+  const [newRole, setNewRole] = useState("");
+  const [changingRole, setChangingRole] = useState(false);
   const { toast } = useToast();
 
   const lc = useListControls<TrainerRow>(trainers, (tr, q) =>
