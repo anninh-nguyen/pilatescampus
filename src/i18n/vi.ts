@@ -129,6 +129,9 @@ export default {
       adding: "Đang thêm…",
       level: "Cấp bậc",
       levelUpdated: "Đã cập nhật cấp bậc HLV",
+      changeRole: "Đổi vai trò",
+      selectRole: "Chọn vai trò mới",
+      roleChanged: "Đã đổi vai trò thành công",
     },
     compensation: {
       title: "Thù lao huấn luyện viên",
