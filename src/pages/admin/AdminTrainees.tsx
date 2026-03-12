@@ -46,6 +46,12 @@ export default function AdminTrainees() {
   const [editCredits, setEditCredits] = useState("");
   const [saving, setSaving] = useState(false);
 
+  // Role change dialog state
+  const [roleOpen, setRoleOpen] = useState(false);
+  const [roleTrainee, setRoleTrainee] = useState<TraineeRow | null>(null);
+  const [newRole, setNewRole] = useState("");
+  const [changingRole, setChangingRole] = useState(false);
+
   // Invite dialog state
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmails, setInviteEmails] = useState("");
