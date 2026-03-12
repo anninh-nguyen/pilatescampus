@@ -129,6 +129,9 @@ export default {
       adding: "Adding…",
       level: "Level",
       levelUpdated: "Trainer level updated",
+      changeRole: "Change Role",
+      selectRole: "Select new role",
+      roleChanged: "Role changed successfully",
     },
     compensation: {
       title: "Trainer Compensation",
@@ -183,6 +186,10 @@ export default {
       inviteAlreadyExists: "{{count}} already have accounts: {{emails}}",
       inviteFailed: "{{count}} failed to send",
       inviteNoValid: "No valid email addresses found",
+      changeRole: "Change Role",
+      changeRoleDesc: "Change this user's role. This will take effect immediately.",
+      selectRole: "Select new role",
+      roleChanged: "Role changed successfully",
     },
     packages: {
       title: "Packages",

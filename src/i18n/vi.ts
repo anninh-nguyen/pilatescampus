@@ -129,6 +129,9 @@ export default {
       adding: "Đang thêm…",
       level: "Cấp bậc",
       levelUpdated: "Đã cập nhật cấp bậc HLV",
+      changeRole: "Đổi vai trò",
+      selectRole: "Chọn vai trò mới",
+      roleChanged: "Đã đổi vai trò thành công",
     },
     compensation: {
       title: "Thù lao huấn luyện viên",
@@ -183,6 +186,10 @@ export default {
       inviteAlreadyExists: "{{count}} đã có tài khoản: {{emails}}",
       inviteFailed: "{{count}} gửi thất bại",
       inviteNoValid: "Không tìm thấy email hợp lệ",
+      changeRole: "Đổi vai trò",
+      changeRoleDesc: "Thay đổi vai trò của người dùng này. Thay đổi có hiệu lực ngay lập tức.",
+      selectRole: "Chọn vai trò mới",
+      roleChanged: "Đã đổi vai trò thành công",
     },
     packages: {
       title: "Gói tập",

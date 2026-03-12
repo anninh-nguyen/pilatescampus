@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Package, Pencil, UserPlus } from "lucide-react";
+import { Package, Pencil, UserPlus, ShieldCheck } from "lucide-react";
 import { addDays } from "date-fns";
 import { ListControls, useListControls } from "@/components/ListControls";
 
@@ -45,6 +45,12 @@ export default function AdminTrainees() {
   const [editName, setEditName] = useState("");
   const [editCredits, setEditCredits] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // Role change dialog state
+  const [roleOpen, setRoleOpen] = useState(false);
+  const [roleTrainee, setRoleTrainee] = useState<TraineeRow | null>(null);
+  const [newRole, setNewRole] = useState("");
+  const [changingRole, setChangingRole] = useState(false);
 
   // Invite dialog state
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -144,6 +150,33 @@ export default function AdminTrainees() {
     fetchTrainees();
   };
 
+  const openRoleDialog = (trainee: TraineeRow) => {
+    setRoleTrainee(trainee);
+    setNewRole("");
+    setRoleOpen(true);
+  };
+
+  const handleRoleChange = async () => {
+    if (!roleTrainee || !newRole) return;
+    setChangingRole(true);
+    try {
+      // Update role in user_roles
+      await supabase.from("user_roles").update({ role: newRole as any }).eq("user_id", roleTrainee.user_id);
+
+      if (newRole === "trainer") {
+        // Create trainer record
+        await supabase.from("trainers").insert({ user_id: roleTrainee.user_id });
+      }
+
+      toast.success(t("admin.trainees.roleChanged"));
+      setRoleOpen(false);
+      fetchTrainees();
+    } catch {
+      toast.error(t("common.error"));
+    }
+    setChangingRole(false);
+  };
+
   const handleInvite = async () => {
     const emails = inviteEmails
       .split(/[\n,;]+/)
@@ -227,6 +260,9 @@ export default function AdminTrainees() {
                       <Button variant="outline" size="sm" onClick={() => openAssignDialog(tr)}>
                         <Package className="mr-1 h-4 w-4" />{t("admin.trainees.assignPackage")}
                       </Button>
+                      <Button variant="ghost" size="sm" onClick={() => openRoleDialog(tr)}>
+                        <ShieldCheck className="mr-1 h-4 w-4" />{t("admin.trainees.changeRole")}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 );
@@ -273,6 +309,29 @@ export default function AdminTrainees() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>{t("common.cancel")}</Button>
             <Button onClick={handleEdit} disabled={saving || !editName.trim()}>{saving ? t("admin.trainees.saving") : t("common.save")}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Role Dialog */}
+      <Dialog open={roleOpen} onOpenChange={setRoleOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("admin.trainees.changeRole")} — {roleTrainee?.full_name}</DialogTitle>
+            <DialogDescription>{t("admin.trainees.changeRoleDesc")}</DialogDescription>
+          </DialogHeader>
+          <Select value={newRole} onValueChange={setNewRole}>
+            <SelectTrigger><SelectValue placeholder={t("admin.trainees.selectRole")} /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="trainer">{t("roles.trainer")}</SelectItem>
+              <SelectItem value="admin">{t("roles.admin")}</SelectItem>
+            </SelectContent>
+          </Select>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRoleOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleRoleChange} disabled={!newRole || changingRole}>
+              {changingRole ? t("common.loading") : t("common.update")}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, ShieldCheck } from "lucide-react";
+import { toast as sonnerToast } from "sonner";
 import { ListControls, useListControls } from "@/components/ListControls";
 
 const TRAINER_LEVELS = ["trainee_trainer", "junior", "senior", "master"] as const;
@@ -24,6 +25,10 @@ export default function AdminTrainers() {
   const [email, setEmail] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [roleOpen, setRoleOpen] = useState(false);
+  const [roleTrainer, setRoleTrainer] = useState<TrainerRow | null>(null);
+  const [newRole, setNewRole] = useState("");
+  const [changingRole, setChangingRole] = useState(false);
   const { toast } = useToast();
 
   const lc = useListControls<TrainerRow>(trainers, (tr, q) =>
@@ -66,6 +71,32 @@ export default function AdminTrainers() {
     await supabase.from("user_roles").delete().eq("user_id", trainer.user_id).eq("role", "trainer");
     await supabase.from("user_roles").upsert({ user_id: trainer.user_id, role: "trainee" as const });
     toast({ title: t("admin.trainers.trainerRemoved") }); fetchTrainers();
+  };
+
+  const openRoleDialog = (trainer: TrainerRow) => {
+    setRoleTrainer(trainer);
+    setNewRole("");
+    setRoleOpen(true);
+  };
+
+  const handleRoleChange = async () => {
+    if (!roleTrainer || !newRole) return;
+    setChangingRole(true);
+    try {
+      await supabase.from("user_roles").update({ role: newRole as any }).eq("user_id", roleTrainer.user_id);
+
+      if (newRole === "trainee") {
+        // Remove trainer record
+        await supabase.from("trainers").delete().eq("user_id", roleTrainer.user_id);
+      }
+
+      sonnerToast.success(t("admin.trainers.roleChanged"));
+      setRoleOpen(false);
+      fetchTrainers();
+    } catch {
+      sonnerToast.error(t("common.error"));
+    }
+    setChangingRole(false);
   };
 
   return (
@@ -115,7 +146,12 @@ export default function AdminTrainers() {
                       </SelectContent>
                     </Select>
                   </TableCell>
-                  <TableCell><Button variant="ghost" size="icon" onClick={() => handleDelete(tr)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="icon" onClick={() => openRoleDialog(tr)} title={t("admin.trainers.changeRole")}>
+                      <ShieldCheck className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(tr)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  </TableCell>
                 </TableRow>
               ))}
               {lc.paginated.length === 0 && (
@@ -125,6 +161,26 @@ export default function AdminTrainers() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Change Role Dialog */}
+      <Dialog open={roleOpen} onOpenChange={setRoleOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{t("admin.trainers.changeRole")} — {roleTrainer?.full_name}</DialogTitle></DialogHeader>
+          <Select value={newRole} onValueChange={setNewRole}>
+            <SelectTrigger><SelectValue placeholder={t("admin.trainers.selectRole")} /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="trainee">{t("roles.trainee")}</SelectItem>
+              <SelectItem value="admin">{t("roles.admin")}</SelectItem>
+            </SelectContent>
+          </Select>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRoleOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleRoleChange} disabled={!newRole || changingRole}>
+              {changingRole ? t("common.loading") : t("common.update")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
