@@ -35,6 +35,7 @@ import {
   User,
   Gift,
   Mail,
+  ScrollText,
 } from "lucide-react";
 
 const adminLinks = [
