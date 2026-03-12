@@ -260,6 +260,9 @@ export default function AdminTrainees() {
                       <Button variant="outline" size="sm" onClick={() => openAssignDialog(tr)}>
                         <Package className="mr-1 h-4 w-4" />{t("admin.trainees.assignPackage")}
                       </Button>
+                      <Button variant="ghost" size="sm" onClick={() => openRoleDialog(tr)}>
+                        <ShieldCheck className="mr-1 h-4 w-4" />{t("admin.trainees.changeRole")}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 );
