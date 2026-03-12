@@ -83,6 +83,7 @@ export default {
     manageBookings: "Manage Bookings",
     promotions: "Promotions",
     emailSettings: "Email Settings",
+    auditLog: "Audit Log",
   },
   bookOnBehalf: {
     title: "Book on Behalf of Trainee",

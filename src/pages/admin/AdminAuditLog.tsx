@@ -19,8 +19,8 @@ interface AuditLog {
   action: string;
   changed_by: string | null;
   changed_at: string;
-  old_data: Record<string, unknown> | null;
-  new_data: Record<string, unknown> | null;
+  old_data: unknown;
+  new_data: unknown;
 }
 
 interface Profile {
