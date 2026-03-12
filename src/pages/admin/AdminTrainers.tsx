@@ -161,6 +161,26 @@ export default function AdminTrainers() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Change Role Dialog */}
+      <Dialog open={roleOpen} onOpenChange={setRoleOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{t("admin.trainers.changeRole")} — {roleTrainer?.full_name}</DialogTitle></DialogHeader>
+          <Select value={newRole} onValueChange={setNewRole}>
+            <SelectTrigger><SelectValue placeholder={t("admin.trainers.selectRole")} /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="trainee">{t("roles.trainee")}</SelectItem>
+              <SelectItem value="admin">{t("roles.admin")}</SelectItem>
+            </SelectContent>
+          </Select>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRoleOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={handleRoleChange} disabled={!newRole || changingRole}>
+              {changingRole ? t("common.loading") : t("common.update")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }

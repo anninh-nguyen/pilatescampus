@@ -186,6 +186,10 @@ export default {
       inviteAlreadyExists: "{{count}} đã có tài khoản: {{emails}}",
       inviteFailed: "{{count}} gửi thất bại",
       inviteNoValid: "Không tìm thấy email hợp lệ",
+      changeRole: "Đổi vai trò",
+      changeRoleDesc: "Thay đổi vai trò của người dùng này. Thay đổi có hiệu lực ngay lập tức.",
+      selectRole: "Chọn vai trò mới",
+      roleChanged: "Đã đổi vai trò thành công",
     },
     packages: {
       title: "Gói tập",

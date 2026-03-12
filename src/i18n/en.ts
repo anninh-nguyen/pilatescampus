@@ -129,6 +129,9 @@ export default {
       adding: "Adding…",
       level: "Level",
       levelUpdated: "Trainer level updated",
+      changeRole: "Change Role",
+      selectRole: "Select new role",
+      roleChanged: "Role changed successfully",
     },
     compensation: {
       title: "Trainer Compensation",
