@@ -150,6 +150,33 @@ export default function AdminTrainees() {
     fetchTrainees();
   };
 
+  const openRoleDialog = (trainee: TraineeRow) => {
+    setRoleTrainee(trainee);
+    setNewRole("");
+    setRoleOpen(true);
+  };
+
+  const handleRoleChange = async () => {
+    if (!roleTrainee || !newRole) return;
+    setChangingRole(true);
+    try {
+      // Update role in user_roles
+      await supabase.from("user_roles").update({ role: newRole as any }).eq("user_id", roleTrainee.user_id);
+
+      if (newRole === "trainer") {
+        // Create trainer record
+        await supabase.from("trainers").insert({ user_id: roleTrainee.user_id });
+      }
+
+      toast.success(t("admin.trainees.roleChanged"));
+      setRoleOpen(false);
+      fetchTrainees();
+    } catch {
+      toast.error(t("common.error"));
+    }
+    setChangingRole(false);
+  };
+
   const handleInvite = async () => {
     const emails = inviteEmails
       .split(/[\n,;]+/)
