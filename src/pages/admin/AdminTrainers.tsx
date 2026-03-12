@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, ShieldCheck } from "lucide-react";
+import { toast as sonnerToast } from "sonner";
 import { ListControls, useListControls } from "@/components/ListControls";
 
 const TRAINER_LEVELS = ["trainee_trainer", "junior", "senior", "master"] as const;
