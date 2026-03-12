@@ -146,7 +146,12 @@ export default function AdminTrainers() {
                       </SelectContent>
                     </Select>
                   </TableCell>
-                  <TableCell><Button variant="ghost" size="icon" onClick={() => handleDelete(tr)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="icon" onClick={() => openRoleDialog(tr)} title={t("admin.trainers.changeRole")}>
+                      <ShieldCheck className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(tr)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  </TableCell>
                 </TableRow>
               ))}
               {lc.paginated.length === 0 && (
