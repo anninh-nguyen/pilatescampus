@@ -83,6 +83,7 @@ export default {
     manageBookings: "Quản lý đặt chỗ",
     promotions: "Khuyến mãi",
     emailSettings: "Cài đặt Email",
+    auditLog: "Nhật ký thay đổi",
   },
   bookOnBehalf: {
     title: "Đặt lịch thay học viên",
