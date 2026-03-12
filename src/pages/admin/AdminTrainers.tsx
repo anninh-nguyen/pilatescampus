@@ -73,6 +73,32 @@ export default function AdminTrainers() {
     toast({ title: t("admin.trainers.trainerRemoved") }); fetchTrainers();
   };
 
+  const openRoleDialog = (trainer: TrainerRow) => {
+    setRoleTrainer(trainer);
+    setNewRole("");
+    setRoleOpen(true);
+  };
+
+  const handleRoleChange = async () => {
+    if (!roleTrainer || !newRole) return;
+    setChangingRole(true);
+    try {
+      await supabase.from("user_roles").update({ role: newRole as any }).eq("user_id", roleTrainer.user_id);
+
+      if (newRole === "trainee") {
+        // Remove trainer record
+        await supabase.from("trainers").delete().eq("user_id", roleTrainer.user_id);
+      }
+
+      sonnerToast.success(t("admin.trainers.roleChanged"));
+      setRoleOpen(false);
+      fetchTrainers();
+    } catch {
+      sonnerToast.error(t("common.error"));
+    }
+    setChangingRole(false);
+  };
+
   return (
     <DashboardLayout>
       <div className="mb-6 flex items-center justify-between">
