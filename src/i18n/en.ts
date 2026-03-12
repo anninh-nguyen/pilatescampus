@@ -325,6 +325,23 @@ export default {
       sendCampaign: "Send Campaign",
       campaignSent: "Campaign sent to all trainees",
     },
+    auditLog: {
+      title: "Audit Log",
+      description: "Track all data changes across the system — who created, updated, or deleted records.",
+      filterTable: "Filter by table",
+      filterAction: "Filter by action",
+      searchUser: "Search by user…",
+      dateTime: "Date & Time",
+      user: "User",
+      action: "Action",
+      table: "Table",
+      recordId: "Record ID",
+      noLogs: "No audit logs found",
+      details: "Change Details",
+      oldData: "Previous Data",
+      newData: "New Data",
+      system: "System",
+    },
   },
   trainer: {
     schedule: {
