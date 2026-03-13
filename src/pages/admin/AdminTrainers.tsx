@@ -127,7 +127,7 @@ export default function AdminTrainers() {
                 <TableHead>{t("admin.trainers.email")}</TableHead>
                 <TableHead>{t("admin.trainers.specialty")}</TableHead>
                 <TableHead>{t("admin.trainers.level")}</TableHead>
-                <TableHead className="w-[60px]" />
+                <TableHead>{t("admin.trainers.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
