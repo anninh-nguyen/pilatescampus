@@ -132,6 +132,8 @@ export default {
       changeRole: "Change Role",
       selectRole: "Select new role",
       roleChanged: "Role changed successfully",
+      actions: "Actions",
+      delete: "Delete",
     },
     compensation: {
       title: "Trainer Compensation",

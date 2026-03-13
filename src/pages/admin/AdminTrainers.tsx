@@ -127,7 +127,7 @@ export default function AdminTrainers() {
                 <TableHead>{t("admin.trainers.email")}</TableHead>
                 <TableHead>{t("admin.trainers.specialty")}</TableHead>
                 <TableHead>{t("admin.trainers.level")}</TableHead>
-                <TableHead className="w-[60px]" />
+                <TableHead>{t("admin.trainers.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -147,10 +147,16 @@ export default function AdminTrainers() {
                     </Select>
                   </TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => openRoleDialog(tr)} title={t("admin.trainers.changeRole")}>
-                      <ShieldCheck className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(tr)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                    <div className="flex items-center space-x-2">
+                      <Button variant="ghost" size="sm" onClick={() => openRoleDialog(tr)}>
+                        <ShieldCheck className="h-4 w-4 mr-1" />
+                        {t("admin.trainers.changeRole")}
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleDelete(tr)}>
+                        <Trash2 className="h-4 w-4 mr-1 text-destructive" />
+                        {t("admin.trainers.delete")}
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

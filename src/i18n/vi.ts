@@ -132,6 +132,8 @@ export default {
       changeRole: "Đổi vai trò",
       selectRole: "Chọn vai trò mới",
       roleChanged: "Đã đổi vai trò thành công",
+      actions: "Hành động",
+      delete: "Xóa",
     },
     compensation: {
       title: "Thù lao huấn luyện viên",
