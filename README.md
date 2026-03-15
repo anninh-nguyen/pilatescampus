@@ -1,73 +1,53 @@
-# Welcome to your Lovable project
+# Introduction
+This is a web-based application that supports a gym stadium manager to operate the gym’s activities. It can reduce paperwork and missed training classes by providing a clear schedule, and the manager can monitor how well the gym is operating from a dashboard.
+The app is accessible at: https://mmpilates.lovable.app/
 
-## Project info
+# Functionalities
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## For Trainees:
+- Create/Login: They can create by their email address or using the OAuth method, such as a Google Account.
+- Book a training session: select an available slot and make a booking at the selected time.
+- View all open bookings
+- Cancel booking
+- Update personal contact information
+- Redeem a voucher to get extra credits
+- Refer a friend via an invitation link to get credits award
+- Change email securely
+- Notification
 
-## How can I edit this code?
+## For Trainers:
+- Create/Login: They can create an account like other trainees and ask the admin to set them as a trainer
+- See the upcoming training session
+- Book new sessions for trainees if they cannot book for themself.
+- Check the finished training session
 
-There are several ways of editing your application.
+## For the administrator:
+- Invite/create new users
+- Manage trainees
+- Assign the training package to a trainee, update the training credits
+- Manage trainers
+- Manage training packages
+- Manage schedule, create training class
+- Manage bookings
+- Configure the price model for training times on a day
+(peak time or off-peak time)
+- Configure the cancellation policy: let the credit be refunded or not depend on the time the trainee cancels their bookings in advance
+- Compensation: Calculate salary for trainer on each successful training session, can be a fixed amount or a percentage
+- Create promotion/campaign: to give credits to trainees in many ways
+- Configure email content to send out emails from the app, such as activation email, change password, promotion, and credits awarding.
 
-**Use Lovable**
+## General functions:
+- Change theme
+- Change language
+- Show/Hide main menu
+- Logout
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+# Libraries
+The app is using these main libraries or external APIs:
+- Open authorization: Google account
+- Supabase: store database and web-hooks, such as
+- i18n to translate languages
+- Use Vite to generate a frontend codebase
+- Use React.js to build the app structure and components
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+# Please watch the file: "Functional highlight.pdf" for more screenshots
